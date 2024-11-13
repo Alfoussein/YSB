@@ -1,0 +1,82 @@
+<script>
+
+const tBody = document.querySelector('tbody');
+let dataName = prompt("Write the name");
+let hour;
+let minutes;
+//modifyEntry(tBody, dataName)
+let name;
+let buttonNext 
+
+let buttonModify;
+
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+async function modifyEntry(tBody, dataName) {
+    for (let i = 0; i < tBody.childNodes.length; i++) {
+        let name = tBody.childNodes[i].childNodes[3].childNodes[0].textContent;
+
+        if (name === dataName) {
+            // Cliquez sur le bouton de modification
+            let buttonModify = tBody.childNodes[i].childNodes[8].childNodes[0];
+            buttonModify.click();
+
+            await sleep(1500);
+
+            // Cliquer sur le bouton "suivant"
+            let buttonNext = document.querySelector('#weiter');
+            buttonNext.click();
+
+            await sleep(1500);
+
+            // Modifier les heures et les minutes
+            document.querySelector('#anderestunde').value = hour;
+            document.querySelector('#andereminute').value = minutes;
+            document.querySelector("#anderestunde option[value='"+hour+"']").selected = true;
+            document.querySelector("#andereminute option[value='"+minutes+"']").selected = true;
+            document.querySelector('#anderestunde').dispatchEvent(new Event("change"));
+            document.querySelector('#andereminute').dispatchEvent(new Event("change"));
+            
+            await sleep(1500);
+            
+            buttonNext.click();
+
+            await sleep(1500);
+
+            // Répéter la modification
+            document.querySelector('#anderestunde').value = hour;
+            document.querySelector('#andereminute').value = minutes;
+            document.querySelector("#anderestunde option[value='"+hour+"']").selected = true;
+            document.querySelector("#andereminute option[value='"+minutes+"']").selected = true;
+            document.querySelector('#anderestunde').dispatchEvent(new Event("change"));
+            document.querySelector('#andereminute').dispatchEvent(new Event("change"));
+            
+            await sleep(1500);
+            buttonNext.click();
+
+            await sleep(1500);
+
+            // Effectuer une série de clics sur #radio_0 avec des pauses
+            for (let j = 0; j < 3; j++) {
+                document.querySelector('#radio_0').checked = true;
+                document.querySelector('#radio_0').dispatchEvent(new Event("change"));
+                await sleep(1500);
+            }
+            
+            await sleep(1500);
+            document.querySelector('#radio_1').checked = true;
+            document.querySelector('#radio_1').dispatchEvent(new Event("change"));
+
+            await sleep(2000);
+            document.querySelector('#neuesfotofile').click()
+            
+            break; // Terminer la boucle après la modification trouvée
+        }
+    }
+}
+
+hour = "";
+minutes = "";
+//modifyEntry(tBody, dataName)
+  
+</script>
