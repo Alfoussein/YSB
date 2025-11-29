@@ -1,0 +1,2795 @@
+### Fichiers JavaScript + index_for_video.html du projet ###
+
+## Fichiers à la racine (JS + index_for_video.html) ##
+
+### Fichier: fileexplorer.js ###
+
+const fs = require('fs');
+const path = require('path');
+
+function getFiles() {
+    const projectRoot = process.cwd();
+    let fileContents = [];
+
+    // Fonction pour lire un fichier (JS ou HTML)
+    function readFileIfWanted(file) {
+        const fullPath = path.join(projectRoot, file);
+        if (!fs.existsSync(fullPath)) return null;
+
+        // On accepte .js + index_for_video.html uniquement
+        const ext = path.extname(file).toLowerCase();
+        if (ext === '.js' || file === 'index_for_video.html') {
+            try {
+                const content = fs.readFileSync(fullPath, 'utf8');
+                return {
+                    fileName: file,
+                    path: fullPath,
+                    content: content
+                };
+            } catch (error) {
+                console.error(`Erreur de lecture du fichier ${file}:`, error);
+                return null;
+            }
+        }
+        return null;
+    }
+
+    // === 1. Fichiers à la racine (JS + index_for_video.html) ===
+    const rootFiles = fs.readdirSync(projectRoot);
+    const wantedRootFiles = rootFiles
+        .map(file => {
+            const ext = path.extname(file).toLowerCase();
+            if (ext === '.js' || file === 'index_for_video.html') {
+                return readFileIfWanted(file);
+            }
+            return null;
+        })
+        .filter(Boolean);
+
+    // === 2. Tous les .js dans le dossier scripts ===
+    const scriptsPath = path.join(projectRoot, 'scripts');
+    let scriptsFiles = [];
+    if (fs.existsSync(scriptsPath)) {
+        const scriptsList = fs.readdirSync(scriptsPath);
+        scriptsFiles = scriptsList
+            .filter(file => path.extname(file).toLowerCase() === '.js')
+            .map(file => {
+                const fullPath = path.join(scriptsPath, file);
+                try {
+                    const content = fs.readFileSync(fullPath, 'utf8');
+                    return {
+                        fileName: file,
+                        path: fullPath,
+                        content: content
+                    };
+                } catch (error) {
+                    console.error(`Erreur lecture ${file}:`, error);
+                    return null;
+                }
+            })
+            .filter(Boolean);
+    }
+
+    // === Combinaison finale ===
+    fileContents = [...wantedRootFiles, ...scriptsFiles];
+
+    return fileContents;
+}
+
+function saveToTextFile(fileContents) {
+    let output = '### Fichiers JavaScript + index_for_video.html du projet ###\n\n';
+
+    // Séparer racine et scripts
+    const rootFiles = fileContents.filter(f => !f.path.includes('/scripts') && !f.path.includes('\\scripts'));
+    const scriptsFiles = fileContents.filter(f => f.path.includes('/scripts') || f.path.includes('\\scripts'));
+
+    if (rootFiles.length > 0) {
+        output += '## Fichiers à la racine (JS + index_for_video.html) ##\n\n';
+        rootFiles.forEach(file => {
+            output += `### Fichier: ${file.fileName} ###\n\n`;
+            output += file.content.trim();
+            output += '\n\n---\n\n';
+        });
+    }
+
+    if (scriptsFiles.length > 0) {
+        output += '## Fichiers JS dans le dossier scripts ##\n\n';
+        scriptsFiles.forEach(file => {
+            output += `### Fichier: ${file.fileName} ###\n\n`;
+            output += file.content.trim();
+            output += '\n\n---\n\n';
+        });
+    }
+
+    fs.writeFileSync('project_js_and_index.txt', output, 'utf8');
+    console.log('Terminé → project_js_and_index.txt créé avec succès !');
+    console.log(`Fichiers inclus : ${fileContents.length} (dont index_for_video.html si présent)`);
+}
+
+// === Exécution ===
+try {
+    const files = getFiles();
+    if (files.length > 0) {
+        saveToTextFile(files);
+    } else {
+        console.log('Aucun fichier trouvé (vérifie que index_for_video.html est bien à la racine)');
+    }
+} catch (error) {
+    console.error('Erreur:', error);
+}
+
+---
+
+### Fichier: index_for_video.html ###
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sports Carousel Mockup - 3 Horizontal Vertical Continuous Scroll with Flags</title>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat+Brush:wght@400&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
+      align-items: center;
+      min-height: 100vh;
+      overflow-x: auto;
+      gap: 20px;
+      position: relative;
+    }
+    .pinatas-fire {
+      font-family: 'Caveat Brush', cursive;
+      font-size: 5rem;
+      color: #fdbd4a;
+      transform: skewX(-6deg);
+      text-shadow: 9px 7px 0 #ff0e00a1, 12px 10px 2px rgba(255, 140, 0, 0.6), 1px 1px 2px rgba(255, 255, 255, 0.5), 0 0 5px #ff4500;
+      filter: contrast(1.4) drop-shadow(4px 6px 12px rgba(0, 0, 0, 0.3));
+      animation: fire-trail 4s ease forwards;
+      overflow: hidden;
+      border-right: 3px solid #ff4500;
+      white-space: nowrap;
+      text-align: center;
+      margin: 1rem 0rem 0rem 0rem;
+    }
+    #Departure-city {
+      margin: 0.5rem 0rem 1.5rem 0rem;
+      text-align: center; /* Added: Center the entire block */
+    }
+    #Departure-city p {
+      margin: 0;
+      font-size: 2rem;
+      color: #fff;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+      background-color: rgb(239 198 124 / 87%);
+      padding: 0.25rem 2.75rem;
+      border-radius: 2rem;
+    }
+    #Departure-city p:nth-child(1) {
+      margin: 0;
+      font-size: 1.25rem;
+      color: #fff;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+      text-align: center;
+      margin-bottom: 0.5rem;
+      width: auto; /* Already auto, but background is on the p */
+      margin-left: 0; /* Removed: No left margin to allow full centering */
+      display: inline-block; /* Added: Makes background hug text width */
+      width: fit-content; /* Added: Adapts width to content length */
+      padding: 0.25rem 1rem; /* Adjusted: Smaller padding for shorter text like "From" */
+    }
+    @keyframes fire-trail {
+      0% { opacity: 0; filter: blur(2px); width: 0; }
+      100% { opacity: 1; width: 100%; filter: blur(0); }
+    }
+    .parent-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      gap: 30px;
+      padding-bottom: 20px;
+    }
+    .carousel-container {
+      position: relative;
+      width: 16vw;
+      height: 64vh;
+      background: linear-gradient(135deg, rgba(68, 32, 40, .397) 0%, rgba(254, 214, 227, 0) 100%);
+      border-radius: 25px;
+      overflow: hidden;
+      box-shadow: 0 25px 50px rgba(6, 6, 6, .032);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      animation: float 3s ease-in-out infinite;
+      padding: 0 2%;
+      box-shadow: -14px -14px 7px #0000009e;
+    }
+    .carousel-container::after {
+      content: '';
+      position: absolute;
+      bottom: -15px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 130%;
+      height: 30px;
+      background: radial-gradient(ellipse at center, rgba(0, 0, 0, .25) 0%, rgba(0, 0, 0, .1) 30%, transparent 70%);
+      border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+      z-index: -1;
+      filter: blur(8px);
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .carousel-wrapper {
+      display: flex;
+      flex-direction: column;
+      width: 85%;
+      height: 100%;
+      position: relative;
+      padding: 0 5%;
+      transition: transform .3s ease;
+      gap: 6.5%;
+      cursor: grab;
+      user-select: none;
+      will-change: transform;
+    }
+    .carousel-wrapper:active {
+      cursor: grabbing;
+    }
+    @keyframes scrollVertical {
+      0%   { transform: translateY(0); }
+      100% { transform: translateY(-28.5%); }
+    }
+
+    @keyframes scrollHorizontal {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-28.5%); }
+    }
+    .carousel-wrapper.animating {
+      animation: scrollVertical 10s linear infinite;
+    }
+    .carousel-card {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      border-radius: 5px;
+      overflow: hidden;
+      box-shadow: 0 15px 35px rgba(0 0, 0, .2);
+      transition: all .4s ease;
+      position: relative;
+      opacity: 1;
+      transform: scale(1);
+      flex-shrink: 0;
+    }
+    .carousel-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      opacity: .88;
+      position: relative;
+      z-index: 1;
+    }
+    .overlay-img {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 50%;
+      height: auto;
+      opacity: .7;
+      z-index: 2;
+    }
+    .card-slot {
+      position: relative;
+      height: 11.5vh;
+      flex-shrink: 0;
+    }
+    .card-slot .carousel-card {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 85%;
+      border-radius: 8px;
+    }
+    .card-slot .container-city-text {
+    position: absolute;
+    z-index: 6;
+    bottom: -18px;
+    flex: auto;
+    justify-content: center;
+    width: 100%;
+    display: flex;
+    line-break: auto;
+    padding: .5em 0;
+    background-color: #efc77c;
+    border-radius: 0 0 20px 20px;
+    box-shadow: 1px 0 13px 0 black;
+    height: 2.45rem;
+    display: inline-block;
+}
+.date {
+    margin: 0;
+    text-align: center;
+    color: #000;
+    font-weight: 580;
+    font-size: 0.90rem;
+    padding-top: 0.25rem;
+    background: #d087007d;
+    padding: 3px 0px;
+}
+    .city-destination {
+      margin: 4px;
+      text-align: center;
+      color: #000;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+    .etiquet-price {
+      position: absolute;
+      top: 12px;
+      left: -.85rem;
+      background: rgb(239 198 124 / 90%);
+      width: 4rem;
+      margin-right: -.65rem;
+      padding: .2rem 1.2rem;
+      border-radius: 0 5px 5px 0;
+      z-index: 6;
+      box-sizing: border-box;
+      display: inline-flex;
+      align-items: center;
+      
+    }
+    .etiquet-price p {
+      margin: 0;
+      padding-top: .4rem;
+      display: flex;
+      font-size: 1.3rem;
+      font-weight: 600;
+      color: #000446;
+    }
+    .etiquet-price p:after {
+      content: "€";
+      margin-left: 3px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #000;
+    }
+    .etiquet-price div {
+      position: absolute;
+      bottom: -23px;
+      left: 0;
+      width: 0;
+      height: 0;
+      border-top: 13px solid #c58102;
+      border-bottom: 10px solid transparent;
+      border-left: 13px solid transparent;
+      z-index: -6;
+    }
+    .carousel-wrapper:hover {
+      animation-play-state: paused;
+    }
+    @media (max-width: 768px) {
+      body {
+        align-items: center;
+        overflow-y: auto;
+        overflow-x: hidden;
+        padding: 10px;
+      }
+    
+      .pinatas-fire { font-size: 5rem; margin: 1rem 0rem 1rem 0rem; } /* Ajust pour landscape */
+      #Departure-city{
+          font-size: 3rem;
+          margin: 0.5rem 0rem 2rem 0rem;
+      }
+      .parent-container {
+        flex-direction: row;
+        justify-content: center;
+        gap: 30px;
+        width: 100%;
+      }
+      .carousel-container {
+        width: 35vw;
+        height: 60vh;
+        max-width: 200px;
+      }
+      .parent-container > .carousel-container:nth-child(3) {
+        display: none;
+      }
+
+      .carousel-wrapper {
+        gap: 6.5%;
+      }
+      .carousel-container::after {
+        width: 110%;
+        bottom: -10px;
+        height: 20px;
+      }
+      .card-slot { height: 25%; }
+      .card-slot .carousel-card { height: 86%; }
+      .etiquet-price { width: 14vw; }
+    }
+    @media (max-width: 430px) {
+      .parent-container { gap: 10px; }
+      .carousel-container {
+        width: 40vw;
+        max-width: 180px;
+      }
+      .card-slot { height: 25%; }
+      .etiquet-price { top: 10px; width: 5.5rem; right: -.45rem; }
+      .pinatas-fire { font-size: clamp(2.5rem, 10vw, 4rem); }
+    }
+    @media (orientation: landscape) and (max-height: 500px) {
+      #logo { font-size: clamp(3rem, 8vw, 5rem); }
+      body {
+        align-items: center;
+        padding: 10px;
+        overflow-x: hidden;
+        overflow-y: auto;
+      }
+      .parent-container {
+        display: block;
+        width: 80%;
+      }
+      .carousel-container:nth-child(1),
+      .carousel-container:nth-child(2) {
+        height: 25vh;
+        width: 70vw;
+        margin-bottom: 10px;
+      }
+      .carousel-container:nth-child(3) { display: none; }
+      .carousel-container {
+        background: linear-gradient(135deg, rgba(68, 32, 40, .397) 0%, rgba(254, 214, 227, 0) 100%);
+        border-radius: 25px;
+        overflow: hidden;
+        box-shadow: 0 25px 50px rgba(6, 6, 6, .032);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        animation: float 3s ease-in-out infinite;
+        padding: 0 2%;
+      }
+      .carousel-wrapper {
+        flex-direction: row;
+        width: 100%;
+        height: 100%;
+        padding: 0 5%;
+        gap: 1.5%;
+        cursor: grab;
+        user-select: none;
+        will-change: transform;
+        transition: transform .3s ease;
+      }
+      .carousel-wrapper.animating {
+        animation: scrollHorizontal 7s linear infinite;
+      }
+      .carousel-wrapper:active { cursor: grabbing; }
+      .carousel-wrapper:hover { animation-play-state: paused; }
+      .card-slot {
+        width: 25%;
+        height: 100%;
+        flex-shrink: 0;
+        position: relative;
+      }
+      .card-slot .carousel-card {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, .2);
+        transition: all .4s ease;
+        opacity: 1;
+        transform: scale(1);
+        flex-shrink: 0;
+      }
+      .card-slot .carousel-card img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+        opacity: .88;
+        position: relative;
+        z-index: 1;
+      }
+      .overlay-img {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 50%;
+        height: auto;
+        opacity: .7;
+        z-index: 2;
+      }
+      .container-city-text {
+        position: absolute;
+        z-index: 6;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: auto;
+        padding: .5em 0;
+        background-color: #e357297a;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .city-destination {
+        margin: 0;
+        text-align: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: .8rem;
+      }
+      .etiquet-price {
+        position: absolute;
+        top: 12px;
+        left: -0.85rem;
+        background: #fdbd4a;
+        width: auto;
+        margin-right: -.65rem;
+        padding: .2rem 1.2rem;
+        border-radius: 0 5px 5px 0;
+        z-index: 6;
+        box-sizing: border-box;
+        display: inline-flex;
+        align-items: center;
+      }
+      .etiquet-price p {
+        margin: 0;
+        padding-top: .4rem;
+        display: flex;
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #000446;
+      }
+      .etiquet-price p:after {
+        content: "/match";
+        margin-left: 5px;
+        font-size: 12px;
+        font-weight: 300;
+        color: #4d4d4d;
+      }
+      .etiquet-price div {
+        position: absolute;
+        bottom: -23px;
+        left: 0;
+        width: 0;
+        height: 0;
+        border-top: 13px solid #c58102;
+        border-bottom: 10px solid transparent;
+        border-left: 13px solid transparent;
+        z-index: -6;
+      }
+      .carousel-container::after {
+        content: '';
+        position: absolute;
+        bottom: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 130%;
+        height: 30px;
+        background: radial-gradient(ellipse at center, rgba(0, 0, 0, .25) 0%, rgba(0, 0, 0, .1) 30%, transparent 70%);
+        border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+        z-index: -1;
+        filter: blur(8px);
+      }
+      .pinatas-fire { font-size: 5rem; margin: 0rem ; } /* Ajust pour landscape */
+      #Departure-city{
+          font-size: 2rem;
+          margin: 0rem; 
+      }
+    }
+    #bg-image {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      min-width: 100%;
+      min-height: 100%;
+      width: auto;
+      height: auto;
+      z-index: -1;
+      transform: translate(-50%, -50%);
+      object-fit: cover; 
+    }
+    .video-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      z-index: 0;
+    }
+    .content {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+  </style>
+</head>
+<body>
+  <img src="./assets/img/pexels-muhammad-akbar-putra-2151015639-31487389.jpg" id="bg-image" alt="Background Image"> <!-- Changed: Video to static image; update src to your picture path -->
+  <div class="video-overlay"></div>
+  <div class="content">
+    <div id="logo"><h1 class="pinatas-fire">WingsToVibes</h1></div>
+    <div id="Departure-city"><p>From</p><p>Paris</p></div>
+    <div class="parent-container">
+      <!-- Carousel 1 -->
+      <div class="carousel-container">
+        <div class="carousel-wrapper animating" id="carouselWrapper1">
+          <div class="card-slot">
+            <div class="carousel-card"><img src="https://flagcdn.com/w320/ba.png" alt="Bosnia Flag"></div>
+            <div class="etiquet-price"><p>15</p><div></div></div>
+            <div class="container-city-text"><p class="date">Nov 20 - Nov 25</p><p class="city-destination">Sarajevo</p></div>
+          </div>
+          <div class="card-slot">
+            <div class="carousel-card"><img src="https://flagcdn.com/w320/bg.png" alt="Bulgaria Flag"></div>
+            <div class="etiquet-price"><p>20</p><div></div></div>
+            <div class="container-city-text"><p class="date">Nov 20 - Nov 25</p><p class="city-destination">Sofia</p></div>
+          </div>
+          <div class="card-slot">
+            <div class="carousel-card"><img src="https://flagcdn.com/w320/cy.png" alt="Cyprus Flag"></div>
+            <div class="etiquet-price"><p>18</p><div></div></div>
+            <div class="container-city-text"><p class="date">Nov 20 - Nov 25</p><p class="city-destination">Paphos</p></div>
+          </div>
+          <div class="card-slot">
+            <div class="carousel-card"><img src="https://flagcdn.com/w320/ba.png" alt="Bosnia Flag"></div>
+            <div class="etiquet-price"><p>15</p><div></div></div>
+            <div class="container-city-text"><p class="date">Nov 20 - Nov 25</p><p class="city-destination">Sarajevo</p></div>
+          </div>
+          <div class="card-slot">
+            <div class="carousel-card"><img src="https://flagcdn.com/w320/bg.png" alt="Bulgaria Flag"></div>
+            <div class="etiquet-price"><p>20</p><div></div></div>
+            <div class="container-city-text"><p class="date">Nov 20 - Nov 25</p><p class="city-destination">Sofia</p></div>
+          </div>
+          <div class="card-slot">
+            <div class="carousel-card"><img src="https://flagcdn.com/w320/cy.png" alt="Cyprus Flag"></div>
+            <div class="etiquet-price"><p>18</p><div></div></div>
+            <div class="container-city-text"><p class="date">Nov 20 - Nov 25</p><p class="city-destination">Paphos</p></div>
+          </div>
+        </div>
+      </div>
+      <!-- Carousel 2 -->
+      <div class="carousel-container">
+        <div class="carousel-wrapper animating" id="carouselWrapper2">
+          <div class="card-slot">
+            <div class="carousel-card"><img src="https://flagcdn.com/w320/hr.png" alt="Croatia Flag"></div>
+            <div class="etiquet-price"><p>25</p><div></div></div>
+            <div class="container-city-text"><p class="date">Dec 15 - Dec 20</p><p class="city-destination">Zagreb</p></div>
+          </div>
+          <div class="card-slot">
+            <div class="carousel-card"><img src="https://flagcdn.com/w320/ee.png" alt="Estonia Flag"></div>
+            <div class="etiquet-price"><p>12</p><div></div></div>
+            <div class="container-city-text"><p class="date">Dec 15 - Dec 20</p><p class="city-destination">Tallinn</p></div>
+          </div>
+          <div class="card-slot">
+            <div class="carousel-card"><img src="https://flagcdn.com/w320/es.png" alt="Spain Flag"></div>
+            <div class="etiquet-price"><p>30</p><div></div></div>
+            <div class="container-city-text"><p class="date">Dec 15 - Dec 20</p><p class="city-destination">Madrid</p></div>
+          </div>
+          <div class="card-slot">
+            <div class="carousel-card"><img src="https://flagcdn.com/w320/hr.png" alt="Croatia Flag"></div>
+            <div class="etiquet-price"><p>25</p><div></div></div>
+            <div class="container-city-text"><p class="date">Dec 15 - Dec 20</p><p class="city-destination">Zagreb</p></div>
+          </div>
+          <div class="card-slot">
+            <div class="carousel-card"><img src="https://flagcdn.com/w320/ee.png" alt="Estonia Flag"></div>
+            <div class="etiquet-price"><p>12</p><div></div></div>
+            <div class="container-city-text"><p class="date">Dec 15 - Dec 20</p><p class="city-destination">Tallinn</p></div>
+          </div>
+          <div class="card-slot">
+            <div class="carousel-card"><img src="https://flagcdn.com/w320/es.png" alt="Spain Flag"></div>
+            <div class="etiquet-price"><p>30</p><div></div></div>
+            <div class="container-city-text"><p class="date">Dec 15 - Dec 20</p><p class="city-destination">Madrid</p></div>
+          </div>
+        </div>
+      </div>
+      <!-- Carousel 3 -->
+      <div class="carousel-container">
+        <div class="carousel-wrapper animating" id="carouselWrapper3">
+          <div class="card-slot">
+            <div class="carousel-card"><img src="https://flagcdn.com/w320/fi.png" alt="Finland Flag"></div>
+            <div class="etiquet-price"><p>22</p><div></div></div>
+            <div class="container-city-text"><p class="date">Jan 10 - Jan 15</p><p class="city-destination">Helsinki</p></div>
+          </div>
+          <div class="card-slot">
+            <div class="carousel-card"><img src="https://flagcdn.com/w320/fr.png" alt="France Flag"></div>
+            <div class="etiquet-price"><p>35</p><div></div></div>
+            <div class="container-city-text"><p class="date">Jan 10 - Jan 15</p><p class="city-destination">Paris</p></div>
+          </div>
+          <div class="card-slot">
+            <div class="carousel-card"><img src="https://flagcdn.com/w320/ge.png" alt="Georgia Flag"></div>
+            <div class="etiquet-price"><p>16</p><div></div></div>
+            <div class="container-city-text"><p class="date">Jan 10 - Jan 15</p><p class="city-destination">Tbilisi</p></div>
+          </div>
+          <div class="card-slot">
+            <div class="carousel-card"><img src="https://flagcdn.com/w320/fi.png" alt="Finland Flag"></div>
+            <div class="etiquet-price"><p>22</p><div></div></div>
+            <div class="container-city-text"><p class="date">Jan 10 - Jan 15</p><p class="city-destination">Helsinki</p></div>
+          </div>
+          <div class="card-slot">
+            <div class="carousel-card"><img src="https://flagcdn.com/w320/fr.png" alt="France Flag"></div>
+            <div class="etiquet-price"><p>35</p><div></div></div>
+            <div class="container-city-text"><p class="date">Jan 10 - Jan 15</p><p class="city-destination">Paris</p></div>
+          </div>
+          <div class="card-slot">
+            <div class="carousel-card"><img src="https://flagcdn.com/w320/ge.png" alt="Georgia Flag"></div>
+            <div class="etiquet-price"><p>16</p><div></div></div>
+            <div class="container-city-text"><p class="date">Jan 10 - Jan 15</p><p class="city-destination">Tbilisi</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    function initCarousels() {
+      document.querySelectorAll(".carousel-wrapper").forEach(w => {
+        w.removeEventListener("mousedown", w._onStart);
+        w.removeEventListener("touchstart", w._onStart);
+        document.removeEventListener("mousemove", w._onMove);
+        document.removeEventListener("mouseup", w._onEnd);
+        w.removeEventListener("touchmove", w._onMove);
+        w.removeEventListener("touchend", w._onEnd);
+
+        const s = getComputedStyle(w),
+          h = s.flexDirection === "row",
+          c = .25 + .015,
+          t = h ? w.scrollWidth - w.offsetWidth : w.scrollHeight - w.offsetHeight;
+        let d = 0, p = 0, x = 0;
+
+        const g = () => {
+          const m = getComputedStyle(w).transform;
+          return !m || m === "none" ? 0 : parseFloat(m.split(",")[h ? 4 : 5].trim()) || 0;
+        },
+        u = n => { w.style.transform = `translate${h ? "X" : "Y"}(${n}px)`; },
+        r = e => {
+          const o = h ? w.offsetWidth : w.offsetHeight,
+            i = Math.round(e / (o * c)) * (o * c),
+            a = Math.max(Math.min(i, 0), -t);
+          u(a);
+        },
+        o = e => {
+          d = 1;
+          p = h ? (e.clientX || e.touches[0].clientX) : (e.clientY || e.touches[0].clientY);
+          x = g();
+          w.classList.remove("animating");
+          e.preventDefault();
+        },
+        n = e => {
+          if (!d) return;
+          const i = h ? (e.clientX || e.touches[0].clientX) : (e.clientY || e.touches[0].clientY),
+            a = i - p,
+            l = x + a,
+            s = Math.max(Math.min(l, 0), -t);
+          u(s);
+          e.preventDefault();
+        },
+        i = () => {
+          if (d) {
+            d = 0;
+            r(g());
+            w.classList.add("animating");
+          }
+        };
+
+        w._onStart = o;
+        w._onMove = n;
+        w._onEnd = i;
+
+        w.addEventListener("mousedown", o);
+        document.addEventListener("mousemove", n);
+        document.addEventListener("mouseup", i);
+
+        w.addEventListener("touchstart", o, { passive: !1 });
+        document.addEventListener("touchmove", n, { passive: !1 });
+        document.addEventListener("touchend", i);
+      });
+    }
+    initCarousels();
+    let resizeTimeout;
+    window.addEventListener("resize", () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(initCarousels, 250);
+    });
+  </script>
+  <script>
+(async function populateFromServer() {
+  const params = new URLSearchParams(location.search);
+  const cityParam = params.get('city') || '';
+  try {
+    const resp = await fetch(`/data?city=${encodeURIComponent(cityParam)}`);
+    const json = await resp.json();
+    const months = json.months || {};
+    const departure = json.departure || cityParam || document.querySelector('#Departure-city p:nth-child(2)')?.textContent || '';
+    // update departure display
+    const depEl = document.querySelector('#Departure-city p:nth-child(2)');
+    if (depEl) depEl.textContent = departure;
+
+    // wrappers
+    const wrappers = [
+      document.getElementById('carouselWrapper1'),
+      document.getElementById('carouselWrapper2'),
+      document.getElementById('carouselWrapper3')
+    ].filter(Boolean);
+
+    // clear existing sample slots
+    wrappers.forEach(w => { while (w.firstChild) w.removeChild(w.firstChild); });
+
+    const monthKeys = Object.keys(months).sort();
+    // Added: If screen width < 768, filter to last 2 months only
+    let filteredKeys = monthKeys;
+    if (window.innerWidth < 768 && monthKeys.length > 2) {
+      filteredKeys = monthKeys.slice(-2); // e.g., for nov/dec/jan -> dec/jan
+    }
+    let wrapperIdx = 0;
+    for (let mi = 0; mi < filteredKeys.length; mi++) {
+      const m = filteredKeys[mi];
+      const rows = months[m] || [];
+      // distribute month block to a wrapper (round-robin)
+      const target = wrappers[wrapperIdx % wrappers.length];
+      wrapperIdx++;
+      for (const row of rows) {
+        const slot = createCardSlot(row);
+        target.appendChild(slot);
+      }
+    }
+
+    // re-init interactions (existing function in page)
+    if (typeof initCarousels === 'function') initCarousels();
+
+    // signal ready for recorder
+    window.__carouselReady = true;
+  } catch (e) {
+    console.error('populate error', e);
+    window.__carouselReady = true; // still allow recorder to continue
+  }
+
+  function createCardSlot(row) {
+    const slot = document.createElement('div');
+    slot.className = 'card-slot';
+
+    const card = document.createElement('div');
+    card.className = 'carousel-card';
+
+    // show flag image only if destCountryCode exists
+    if (row.destCountryCode) {
+      const img = document.createElement('img');
+      img.src = `https://flagcdn.com/w320/${row.destCountryCode}.png`;
+      img.alt = row.countryDest || row.cityDest || '';
+      card.appendChild(img);
+    } else {
+      // fallback visual when no flag: keep card but use background color
+      card.style.background = 'linear-gradient(135deg,#e6e6e6,#ccc)';
+      const title = document.createElement('div');
+      title.style.position = 'absolute';
+      title.style.top = '40%';
+      title.style.left = '50%';
+      title.style.transform = 'translate(-50%,-50%)';
+      title.style.color = '#222';
+      title.style.fontWeight = '700';
+      title.textContent = row.cityDest || '';
+      card.appendChild(title);
+    }
+
+    const price = document.createElement('div');
+    price.className = 'etiquet-price';
+    const p = document.createElement('p');
+    p.textContent = (row.priceFrom || '') + '';
+    price.appendChild(p);
+    const tri = document.createElement('div');
+    price.appendChild(tri);
+
+    const container = document.createElement('div');
+    container.className = 'container-city-text';
+    const dateP = document.createElement('p');
+    dateP.className = 'date';
+    dateP.textContent = row.date || ''; // Added: Dynamic date from CSV row
+    container.appendChild(dateP);
+    const cityP = document.createElement('p');
+    cityP.className = 'city-destination';
+    cityP.textContent = row.cityDest || '';
+    container.appendChild(cityP);
+
+    slot.appendChild(card);
+    slot.appendChild(price);
+    slot.appendChild(container);
+
+    // attach trip link if available
+    if (row.tripUrl) {
+      slot.style.cursor = 'pointer';
+      slot.addEventListener('click', () => {
+        // open in new tab
+        window.open(row.tripUrl, '_blank');
+      });
+    }
+
+    return slot;
+  }
+})();
+</script>
+</body>
+</html>
+
+---
+
+### Fichier: KayakSC.js ###
+
+// ...existing code...
+const puppeteerExtra = require('puppeteer-extra');
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+const XLSX = require('xlsx');
+const fs = require('fs');
+const path = require('path');
+const randomUseragent = require('random-useragent');
+require('dotenv').config();
+
+puppeteerExtra.use(StealthPlugin());
+
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+// normalize key helper (lowercase, remove diacritics, replace hyphens with space)
+function normalizeKey(s) {
+    if (s === undefined || s === null) return '';
+    let t = String(s).trim().toLowerCase();
+    t = t.replace(/[-–—]/g, ' ');
+    t = t.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    t = t.replace(/[^0-9a-z\s]+/g, ' ');
+    t = t.replace(/\s+/g, ' ').trim();
+    return t;
+}
+
+// --- load airport CSV helper ---
+function loadAirportData(csvPath) {
+    const cityMap = new Map(); // key: normalized city/airportName -> { country, iata, airportName }
+    if (!fs.existsSync(csvPath)) return cityMap;
+    const raw = fs.readFileSync(csvPath, 'utf8');
+    const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    if (lines.length <= 1) return cityMap;
+    lines.shift(); // remove header
+    for (const line of lines) {
+        const cols = line.split(';').map(c => c.trim());
+        const airportName = (cols[0] || '').replace(/(^"|"$)/g, '');
+        const city = cols[1] || '';
+        const country = cols[2] || '';
+        const iata = (cols[3] || '').toUpperCase();
+        const keyCity = normalizeKey(city);
+        const keyAirport = normalizeKey(airportName);
+        if (keyCity) cityMap.set(keyCity, { country, iata, airportName });
+        if (keyAirport) cityMap.set(keyAirport, { country, iata, airportName });
+    }
+    return cityMap;
+}
+
+// build date string YYYY-MM-DD from day and month (month as number or '01'..'12')
+// if month earlier than current month, assume next year
+function buildDateFromParts(day, monthStr) {
+    if (!day || !monthStr) return '';
+    const m = parseInt(String(monthStr).replace(/^0+/, '') || monthStr, 10);
+    const d = parseInt(day, 10);
+    if (!m || !d) return '';
+    const now = new Date();
+    let year = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+    if (m < currentMonth) year += 1;
+    const mm = String(m).padStart(2, '0');
+    const dd = String(d).padStart(2, '0');
+    return `${year}-${mm}-${dd}`;
+}
+
+// parse human date range like "6 nov - 8 nov" or "Nov 21 - Nov 22" to YYYY-MM-DD
+function parseDateRangeText(text) {
+    if (!text || typeof text !== 'string') return { depart: '', ret: '' };
+    let t = text.replace(/\./g, '').trim().toLowerCase();
+
+    // Accept several separators and multiple spacing variants
+    const parts = t.split(/\s*[-–—]\s*/).map(p => p.trim()).filter(Boolean);
+
+    const months = {
+        jan: 1, janv: 1, janvier: 1, january: 1,
+        feb: 2, fev: 2, fevrier: 2, février: 2, february: 2,
+        mar: 3, mars: 3, march: 3,
+        apr: 4, avr: 4, avril: 4, april: 4,
+        may: 5, mai: 5,
+        jun: 6, juin: 6, june: 6,
+        jul: 7, juil: 7, juillet: 7, july: 7,
+        aug: 8, aout: 8, août: 8, august: 8,
+        sep: 9, sept: 9, septembre: 9, september: 9,
+        oct: 10, octo: 10, octobre: 10, october: 10,
+        nov: 11, novembre: 11, november: 11,
+        dec: 12, decem: 12, déc: 12, décembre: 12, december: 12
+    };
+
+    function parsePart(part) {
+        if (!part) return '';
+        // Pattern 1: "21 nov" or "6 nov"
+        let m = part.match(/^\s*(\d{1,2})\s*([a-z\u00C0-\u017F]+)\s*(\d{4})?\s*$/i);
+        if (m) {
+            const day = parseInt(m[1], 10);
+            const monRaw = m[2].toLowerCase().replace(/\./g, '').replace(/\s+/g, '');
+            const mon = months[monRaw] || months[monRaw.slice(0,3)];
+            if (!mon || !day) return '';
+            return buildDateFromParts(day, String(mon));
+        }
+        // Pattern 2: "nov 21" or "november 21"
+        m = part.match(/^\s*([a-z\u00C0-\u017F]+)\s*(\d{1,2})\s*(\d{4})?\s*$/i);
+        if (m) {
+            const monRaw = m[1].toLowerCase().replace(/\./g, '').replace(/\s+/g, '');
+            const day = parseInt(m[2], 10);
+            const mon = months[monRaw] || months[monRaw.slice(0,3)];
+            if (!mon || !day) return '';
+            return buildDateFromParts(day, String(mon));
+        }
+        return '';
+    }
+
+    const depart = parsePart(parts[0]) || '';
+    const ret = parts[1] ? parsePart(parts[1]) || '' : '';
+    return { depart, ret };
+}
+
+(async () => {
+    try {
+        const inputExcelFilePath = path.join(__dirname, 'assets', 'others', 'anywhere_flights.xlsx');
+        if (!fs.existsSync(inputExcelFilePath)) {
+            console.error(`Input file not found: ${inputExcelFilePath}`);
+            return;
+        }
+
+        const inputWorkbook = XLSX.readFile(inputExcelFilePath);
+        const inputSheet = inputWorkbook.Sheets[inputWorkbook.SheetNames[0]];
+        const sheetData = XLSX.utils.sheet_to_json(inputSheet, { header: 1 });
+
+        const extractedData = sheetData.map(row => {
+            if (Array.isArray(row) && row.length >= 2) return { country: row[0], city: row[1] };
+            return null;
+        }).filter(Boolean);
+
+        const citiesDepList = extractedData.map(e => (typeof e.city === 'string' ? e.city.trim() : '')).filter(Boolean);
+        const countriesDepList = extractedData.map(e => (typeof e.country === 'string' ? e.country.trim() : ''));
+
+        if (!citiesDepList.length) {
+            console.error('No cities found in anywhere_flights.xlsx — nothing to process.');
+            return;
+        }
+
+        // load airport CSV once
+        const airportCsvPath = path.join(__dirname, 'assets', 'others','airport_Europe.csv');
+        const cityMap = loadAirportData(airportCsvPath);
+
+        const browser = await puppeteerExtra.launch({ headless: false });
+        const page2 = await browser.newPage();
+        await page2.setUserAgent(randomUseragent.getRandom());
+        await page2.setViewport({ width: 1720, height: 1000 });
+
+        // go to a default explore page (can be adjusted)
+        await page2.goto("https://www.kayak.com/explore/", { waitUntil: 'networkidle2' });
+
+        const maxCitiesToProcess = Math.min(3, citiesDepList.length);
+
+        for (let z = 0; z < maxCitiesToProcess; z++) {
+            const cityDep = citiesDepList[z];
+            const countryDep = countriesDepList[z] || 'N/A';
+            console.log(`\n--- Processing city ${z + 1}: ${cityDep} from ${countryDep} ---`);
+
+            const outputExcelFilePath = path.join(__dirname, 'assets', 'others', 'ready_sheets', `${cityDep}.xlsx`);
+            const sheetName = 'anywhere output Flight Data';
+
+            // prepare workbook & sheet (do not write yet)
+            let outputWorkbook;
+            let outputSheet;
+            if (fs.existsSync(outputExcelFilePath)) {
+                outputWorkbook = XLSX.readFile(outputExcelFilePath);
+                outputSheet = outputWorkbook.Sheets[sheetName];
+            } else {
+                outputWorkbook = XLSX.utils.book_new();
+                outputSheet = XLSX.utils.aoa_to_sheet([["cityDep","CountryDep","cityDest","countryDest","IATA","depIATA","priceFrom","date","depDay","depMonth","retDay","retMonth","tripUrl"]]);
+                XLSX.utils.book_append_sheet(outputWorkbook, outputSheet, sheetName);
+            }
+
+            // build dedupe set from existing file rows
+            const existingRows = XLSX.utils.sheet_to_json(outputSheet || {}, { header: 1 });
+            const existingKeys = new Set();
+            for (let i = 1; i < existingRows.length; i++) {
+                const r = existingRows[i] || [];
+                const key = `${r[0] || ''}||${r[2] || ''}||${r[7] || ''}`; // cityDep||cityDest||date (date idx 7)
+                existingKeys.add(key);
+            }
+
+            const newRowsForCity = [];
+
+            // lookup departure IATA once for this origin city
+            let depIata = '';
+            try {
+                const depKey = normalizeKey(cityDep);
+                let depMeta = cityMap.get(depKey);
+                if (!depMeta) {
+                    for (const [k, v] of cityMap.entries()) {
+                        if (!k) continue;
+                        if (depKey.includes(k) || k.includes(depKey)) { depMeta = v; break; }
+                    }
+                }
+                depIata = (depMeta && depMeta.iata) ? depMeta.iata.toLowerCase() : '';
+            } catch (e) {
+                depIata = '';
+            }
+
+            // handle cookies once per city
+            await delay(1500);
+            const cookiesButton = await page2.$('.P4zO-submit-buttons button:nth-child(3)');
+            if (cookiesButton) { await cookiesButton.click().catch(()=>{}); await delay(800); }
+
+            // open origin input and type city
+            try {
+                const candidates = ['.xGVG-location-inputs input.NhpT', '.c4Gq3-input input.NhpT'];
+                let sel = null;
+                // prefer any visible selector
+                for (const s of candidates) {
+                    try {
+                        await page2.waitForSelector(s, { visible: true, timeout: 1200 });
+                        sel = s;
+                        break;
+                    } catch (err) { /* try next */ }
+                }
+                sel = sel || candidates[0]; // fallback
+
+                // ensure stability: wait for element + give extra time for layout/animations
+                await page2.waitForSelector(sel, { visible: true, timeout: 3000 }).catch(()=>{});
+                await page2.waitForTimeout(2000);           // <-- 2s delay you requested
+                await page2.click(sel, { delay: 50 });
+                await page2.evaluate(s => { const el = document.querySelector(s); if (el) el.value = ''; }, sel);
+                await page2.type(sel, cityDep, { delay: 80 });
+                await page2.keyboard.press('Enter');
+                await page2.waitForTimeout(1000);
+            } catch (e) {
+                console.warn('Origin input interaction failed:', e.message);
+            }
+
+            // month loops: collect scraped items into newRowsForCity (but do not write yet)
+            for (let f = 0; f < 3; f++) {
+                await delay(800);
+                // date selector open
+                try {
+                    await page2.click('[aria-label="Select dates"]');
+                    await page2.waitForSelector('.sGVi-dropdown-content', { visible: true, timeout: 5000 });
+                    await delay(1500);
+                } catch (e) {
+                    // ignore
+                }
+                try {
+                    const monthSpans = await page2.$$('.e9D2 span.IAhs');
+                    if (monthSpans.length > f + 1) {
+                        await monthSpans[f + 1].click();
+                        await delay(1200);
+                    }
+                } catch (e) {}
+                // click Done (various fallbacks)
+                try {
+                    const doneSelector = '.CjDg .RxNS-button-content';
+                    await page2.click(doneSelector);
+                    await delay(1000);
+                } catch (e) {
+                    try {
+                        const doneButtons = await page2.$$('div[class*="button-content"]');
+                        for (const btn of doneButtons) {
+                            const text = await page2.evaluate(el => el.textContent.trim().toLowerCase(), btn);
+                            if (['done', 'terminé', 'appliquer', 'valider'].includes(text)) {
+                                await btn.click();
+                                await delay(1000);
+                                break;
+                            }
+                        }
+                    } catch (e2) {}
+                }
+
+                await delay(800);
+                const seeMoreButton = await page2.$('.kHp7-paginator button');
+                if (seeMoreButton) { await seeMoreButton.click().catch(()=>{}); await delay(800); }
+
+                const dataTicketPart = await page2.evaluate(() => {
+                    function parseDateRange(input) {
+                        const months = {
+                            janv: "01", févr: "02", mars: "03", avr: "04", mai: "05", juin: "06",
+                            juil: "07", août: "08", sept: "09", oct: "10", nov: "11", déc: "12",
+                            jan: "01", feb: "02", mar: "03", apr: "04", may: "05", jun: "06", jul: "07", aug: "08", sep: "09", oct: "10", nov: "11", dec: "12"
+                        };
+                        if (!input) return [{ depDay: null, depMonth: null, retDay: null, retMonth: null }];
+                        const cleanedInput = input.replaceAll('.', '').trim();
+                        const parts = cleanedInput.split(' - ');
+                        if (parts.length !== 2) return [{ depDay: null, depMonth: null, retDay: null, retMonth: null }];
+                        const [depPart, retPart] = parts;
+                        // try "21 nov" or "nov 21"
+                        const dp = depPart.split(' ').filter(Boolean);
+                        const rp = retPart.split(' ').filter(Boolean);
+                        const depDay = parseInt(dp.find(p => /\d+/.test(p)) || null, 10) || null;
+                        const depMonth = dp.find(p => /[A-Za-z\u00C0-\u017F]+/.test(p)) || null;
+                        const retDay = parseInt(rp.find(p => /\d+/.test(p)) || null, 10) || null;
+                        const retMonth = rp.find(p => /[A-Za-z\u00C0-\u017F]+/.test(p)) || null;
+                        return [{
+                            depDay: depDay || null,
+                            depMonth: months[depMonth] || months[(depMonth || '').toLowerCase()] || null,
+                            retDay: retDay || null,
+                            retMonth: months[retMonth] || months[(retMonth || '').toLowerCase()] || null
+                        }];
+                    }
+
+                    const arr = [];
+                    const container = document.querySelector('.iTRg-list ul');
+                    if (!container) return arr;
+                    const cardList = container.querySelectorAll('.kHp7-card');
+                    cardList.forEach(card => {
+                        const cardDetail = card.querySelector('.fG2m');
+                        if (!cardDetail) return;
+                        const cityElem = cardDetail.querySelector('.v8LF');
+                        if (!cityElem) return;
+                        if (cityElem.textContent.toLowerCase().includes("anything")) return;
+                        const priceFrom = card.querySelector('.jETt-price')?.innerText || "N/A";
+                        const dateElem = cardDetail.querySelectorAll('.jETt-info')[0];
+                        const dateText = dateElem?.innerText || "";
+                        const parsed = parseDateRange(dateText)[0] || {};
+                        arr.push({
+                            cityDest: cityElem.innerText.trim(),
+                            countryDest: "N/A",
+                            priceFrom: priceFrom,
+                            date: dateText,
+                            depDay: parsed.depDay,
+                            depMonth: parsed.depMonth,
+                            retDay: parsed.retDay,
+                            retMonth: parsed.retMonth
+                        });
+                    });
+                    return arr;
+                }).catch(err => {
+                    console.warn('evaluate failed:', err.message);
+                    return [];
+                });
+
+                for (const element of dataTicketPart) {
+                    element.cityDep = cityDep;
+                    element.countryDep = countryDep;
+
+                    // lookup CSV for destination (normalized)
+                    const destKey = normalizeKey(element.cityDest || '');
+                    let meta = cityMap.get(destKey);
+                    if (!meta) {
+                        for (const [k, v] of cityMap.entries()) {
+                            if (!k) continue;
+                            if (destKey.includes(k) || k.includes(destKey)) { meta = v; break; }
+                        }
+                    }
+                    if (meta) {
+                        if (!element.countryDest || element.countryDest === 'N/A') element.countryDest = meta.country || element.countryDest;
+                        element.iata = meta.iata || '';
+                    } else {
+                        element.iata = element.iata || '';
+                    }
+
+                    // dedupe against existing file + collected new rows
+                    const key = `${element.cityDep || ''}||${element.cityDest || ''}||${element.date || ''}`;
+                    if (existingKeys.has(key)) continue;
+                    existingKeys.add(key);
+
+                    // safer price parsing
+                    let numericPrice = parseInt(String(element.priceFrom || '').replace(/[^\d]/g, ''));
+                    if (isNaN(numericPrice)) numericPrice = 0;
+                    numericPrice = Math.round((numericPrice - (numericPrice * 0.04)) + 10);
+
+                    // arrival IATA
+                    const arrIata = (element.iata || '').toLowerCase();
+
+                    // build dates: try parse from element.date, fallback to parts
+                    const parsed = parseDateRangeText(element.date || '');
+                    const departDate = parsed.depart || buildDateFromParts(element.depDay, element.depMonth);
+                    const returnDate = parsed.ret || buildDateFromParts(element.retDay, element.retMonth);
+
+                    // build trip.com url (append user provided extra params)
+                    const base = 'https://www.trip.com/flights/showfarefirst';
+                    const qsCore = `?dcity=${encodeURIComponent((depIata || '').toLowerCase())}&acity=${encodeURIComponent((arrIata || '').toLowerCase())}&ddate=${encodeURIComponent(departDate)}&rdate=${encodeURIComponent(returnDate)}&triptype=rt&class=y&lowpricesource=searchform&quantity=1&searchboxarg=t&nonstoponly=off&locale=fr-FR&curr=EUR`;
+                    const extra = '&Allianceid=5840682&SID=157302370&trip_sub1=&trip_sub3=D6309634';
+                    const tripDirect = base + qsCore + extra;
+
+                    // Wrap with affiliate redirect (tp.media) — encode the trip.com URL into the "u" parameter
+                    const affiliateBase = 'https://tp.media/r?marker=598952&trs=394660&p=8626';
+                    const campaignId = '121';
+                    const tripUrl = `${affiliateBase}&u=${encodeURIComponent(tripDirect)}&campaign_id=${campaignId}`;
+
+                    newRowsForCity.push([
+                        element.cityDep,
+                        element.countryDep,
+                        element.cityDest,
+                        element.countryDest,
+                        (element.iata || '').toUpperCase(),
+                        (depIata || '').toUpperCase(),
+                        numericPrice,
+                        element.date,
+                        element.depDay,
+                        element.depMonth,
+                        element.retDay,
+                        element.retMonth,
+                        tripUrl
+                    ]);
+                } // end for each scraped item
+            } // end months loop
+
+            // After finishing months for this city: write the workbook once
+            if (newRowsForCity.length > 0) {
+                try {
+                    outputSheet = outputWorkbook.Sheets[sheetName] || XLSX.utils.aoa_to_sheet([["cityDep","CountryDep","cityDest","countryDest","IATA","depIATA","priceFrom","date","depDay","depMonth","retDay","retMonth","tripUrl"]]);
+                    XLSX.utils.sheet_add_aoa(outputSheet, newRowsForCity, { origin: -1 });
+                    outputWorkbook.Sheets[sheetName] = outputSheet;
+                    XLSX.writeFile(outputWorkbook, outputExcelFilePath);
+                    console.log(`Saved ${newRowsForCity.length} new rows to ${outputExcelFilePath}`);
+                } catch (writeErr) {
+                    console.error('Failed to write Excel file:', writeErr.message);
+                }
+            } else {
+                console.log('No new rows to write for', cityDep);
+            }
+
+            console.log(`--- Finished processing city: ${cityDep} ---`);
+        } // end cities loop
+
+        // await browser.close();
+        console.log('Script completed.');
+    } catch (err) {
+        console.error('Fatal error:', err && err.message ? err.message : err);
+    }
+})();
+
+---
+
+### Fichier: kayakScFestival.js ###
+
+// ...updated: randomized human-like delays for actions and typing...
+const puppeteerExtra = require('puppeteer-extra');
+const StealthPlugin = require('puppeteer-extra-plugin-stealth');
+const XLSX = require('xlsx');
+const fs = require('fs');
+const path = require('path');
+const randomUseragent = require('random-useragent');
+require('dotenv').config();
+
+puppeteerExtra.use(StealthPlugin());
+const delay = ms => new Promise(r => setTimeout(r, ms));
+
+// Human-like delay configuration (ms ranges)
+const DELAY_CONFIG = {
+    tiny: [80, 220],
+    short: [300, 700],
+    normal: [900, 1500],
+    long: [2000, 3500],
+    veryLong: [4000, 7000],
+    typing: [80, 160]
+};
+
+function rand(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+async function humanDelay(type = 'normal') {
+    const range = DELAY_CONFIG[type] || DELAY_CONFIG.normal;
+    await delay(rand(range[0], range[1]));
+}
+
+// human-like typing (uses page.type with randomized per-character delay)
+async function humanType(page, selector, text) {
+    const range = DELAY_CONFIG.typing;
+    const perChar = () => rand(range[0], range[1]);
+    // If selector isn't present, fallback to evaluate assignment
+    const el = await page.$(selector);
+    if (!el) {
+        await page.evaluate((sel, val) => {
+            const e = document.querySelector(sel);
+            if (e) {
+                e.value = val;
+                e.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        }, selector, text);
+        return;
+    }
+    // type char-by-char with random delay
+    for (const ch of text) {
+        await page.type(selector, ch, { delay: perChar() });
+    }
+}
+
+function normalizeKey(s) {
+    if (s === undefined || s === null) return '';
+    let t = String(s).trim().toLowerCase();
+    t = t.replace(/[-–—]/g, ' ');
+    t = t.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    t = t.replace(/[^0-9a-z\s]+/g, ' ');
+    t = t.replace(/\s+/g, ' ').trim();
+    return t;
+}
+
+function loadAirportData(csvPath) {
+    const cityMap = new Map();
+    if (!fs.existsSync(csvPath)) return cityMap;
+    const raw = fs.readFileSync(csvPath, 'utf8');
+    const lines = raw.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+    if (lines.length <= 1) return cityMap;
+    lines.shift();
+    for (const line of lines) {
+        const cols = line.split(';').map(c => c.trim());
+        const airportName = (cols[0] || '').replace(/(^"|"$)/g, '');
+        const city = cols[1] || '';
+        const country = cols[2] || '';
+        const iata = (cols[3] || '').toUpperCase();
+        const keyCity = normalizeKey(city);
+        const keyAirport = normalizeKey(airportName);
+        if (keyCity) cityMap.set(keyCity, { country, iata, airportName });
+        if (keyAirport) cityMap.set(keyAirport, { country, iata, airportName });
+    }
+    return cityMap;
+}
+
+// robust excel serial -> YYYY-MM-DD; also accepts Excel Date objects or string "dd/mm/yyyy"
+function parseCellDate(value) {
+    if (!value && value !== 0) return '';
+    if (value instanceof Date && !isNaN(value)) {
+        return value.toISOString().split('T')[0];
+    }
+    if (typeof value === 'number') {
+        const days = Math.floor(value - 25569);
+        const ms = days * 86400 * 1000;
+        const date = new Date(ms);
+        const frac = value - Math.floor(value);
+        if (frac > 0) {
+            const secs = Math.round(frac * 86400);
+            date.setSeconds(date.getSeconds() + secs);
+        }
+        return date.toISOString().split('T')[0];
+    }
+    if (typeof value === 'string') {
+        const s = value.trim();
+        const m1 = s.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+        if (m1) {
+            const dd = m1[1].padStart(2,'0');
+            const mm = m1[2].padStart(2,'0');
+            let yy = m1[3];
+            if (yy.length === 2) yy = '20' + yy;
+            return `${yy}-${mm}-${dd}`;
+        }
+        const iso = new Date(s);
+        if (!isNaN(iso)) return iso.toISOString().split('T')[0];
+    }
+    return '';
+}
+
+// navigate back to search form using the specific Go back button
+async function goBackToForm(page) {
+    try {
+        // Wait for results page to ensure back button is present
+        await page.waitForSelector('.MU1_-content', { timeout: 5000 }).catch(() => {});
+        await humanDelay('short');
+        
+        // Click the specific Go back button
+        const backBtnSelectors = [
+            'div[role="button"].yeiN[aria-label="Go back"]',
+            '.yeiN[aria-label="Go back"]',
+            'div[aria-label="Go back"]'
+        ];
+        let backBtn = null;
+        for (const sel of backBtnSelectors) {
+            backBtn = await page.$(sel);
+            if (backBtn) break;
+        }
+        
+        if (backBtn) {
+            console.log('Clicking Go back button...');
+            // emulate a human move + click
+            try {
+                const box = await backBtn.boundingBox();
+                if (box) {
+                    await page.mouse.move(box.x + box.width/2 + rand(-5,5), box.y + box.height/2 + rand(-5,5));
+                    await humanDelay('tiny');
+                    await page.mouse.click(box.x + box.width/2, box.y + box.height/2);
+                } else {
+                    await backBtn.click();
+                }
+            } catch (e) {
+                await backBtn.click().catch(()=>{});
+            }
+            await humanDelay('long'); // ensure form reloads
+            // Verify we're back on form (check for location inputs)
+            await page.waitForSelector('.xGVG-location-inputs input', { timeout: 5000 }).catch(() => {
+                console.warn('Back navigation: form elements not found immediately');
+            });
+        } else {
+            console.warn('Go back button not found, falling back to Escape key');
+            await page.keyboard.press('Escape');
+            await humanDelay('normal');
+        }
+    } catch (err) {
+        console.warn('Go back failed:', err.message);
+        // Last resort: reload explore page
+        await page.goto('https://www.kayak.com/explore/', { waitUntil: 'networkidle2' });
+        await humanDelay('long');
+    }
+}
+
+// helper: clear input reliably then type + handle c4Gq3 suggestions
+async function clearThenType(page, selector, text, { isC4 = false } = {}) {
+    // ensure selector present
+    try { await page.waitForSelector(selector, { visible: true, timeout: 2500 }); } catch (e) { /* continue */ }
+
+    // try several times to clear previous value
+    for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+            await page.focus(selector).catch(()=>{});
+            await humanDelay('tiny');
+            // Select all + delete (Windows)
+            await page.keyboard.down('Control');
+            await page.keyboard.press('A');
+            await page.keyboard.up('Control');
+            await page.keyboard.press('Backspace');
+            // fallback JS clear & input event
+            await page.evaluate(sel => {
+                const el = document.querySelector(sel);
+                if (el) {
+                    try { el.value = ''; el.dispatchEvent(new Event('input', { bubbles: true })); } catch(e) {}
+                }
+            }, selector).catch(()=>{});
+            await humanDelay('short');
+            const cur = await page.$eval(selector, el => (el && el.value) ? String(el.value).trim() : '', { timeout: 1000 }).catch(()=> '');
+            if (!cur) break;
+        } catch (e) {
+            // small delay then retry
+            await humanDelay('tiny');
+        }
+    }
+
+    // type human-like
+    await humanType(page, selector, text);
+    await humanDelay('short');
+
+    if (isC4) {
+        // wait for suggestion list and click first item
+        try {
+            await page.waitForSelector('.c4Gq3-content ul#smarty-list li', { visible: true, timeout: 4500 });
+            const firstOpt = await page.$('.c4Gq3-content ul#smarty-list li');
+            if (firstOpt) {
+                const b = await firstOpt.boundingBox().catch(()=>null);
+                if (b) {
+                    await page.mouse.move(b.x + Math.floor(Math.random() * (b.width-6)) + 3, b.y + Math.floor(Math.random() * (b.height-6)) + 3);
+                    await humanDelay('tiny');
+                    await page.mouse.click(b.x + b.width/2, b.y + b.height/2);
+                } else {
+                    await firstOpt.click().catch(()=>{});
+                }
+                await humanDelay('normal');
+                return;
+            }
+        } catch (e) {
+            // fallback to Enter if suggestions didn't appear
+        }
+    }
+
+    // default: press Enter to accept suggestion
+    try { await page.keyboard.press('Enter'); } catch(e) {}
+    await humanDelay('normal');
+}
+
+(async () => {
+    try {
+        const inputXlsx = path.join(__dirname, 'assets', 'others', 'anywhere_flights_festival.xlsx');
+        if (!fs.existsSync(inputXlsx)) {
+            console.error(`Input XLSX not found: ${inputXlsx}`);
+            return;
+        }
+
+        const wbIn = XLSX.readFile(inputXlsx);
+        const shIn = wbIn.Sheets[wbIn.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(shIn, { header: 1 });
+
+        if (!rows || rows.length < 2) {
+            console.error('Input has no data.');
+            return;
+        }
+
+        // header mapping
+        const header = rows[0].map(h => String(h || '').trim());
+        const idxCityDep = header.findIndex(h => /city\s*dep/i.test(h)) !== -1 ? header.findIndex(h => /city\s*dep/i.test(h)) : 0;
+        const idxCityDest = header.findIndex(h => /city\s*dest/i.test(h)) !== -1 ? header.findIndex(h => /city\s*dest/i.test(h)) : 1;
+        const idxDate = header.findIndex(h => /date/i.test(h)) !== -1 ? header.findIndex(h => /date/i.test(h)) : 2;
+        const idxEvent = header.findIndex(h => /event/i.test(h)) !== -1 ? header.findIndex(h => /event/i.test(h)) : 3;
+
+        const entries = rows.slice(1).map(r => ({
+            cityDep: String(r[idxCityDep] || '').trim(),
+            cityDest: String(r[idxCityDest] || '').trim(),
+            rawDate: r[idxDate],
+            event: String(r[idxEvent] || '').trim()
+        })).filter(e => e.cityDep && e.cityDest);
+
+        if (!entries.length) {
+            console.error('No valid rows found.');
+            return;
+        }
+
+        const airportCsvPath = path.join(__dirname, 'assets', 'others', 'airport_Europe.csv');
+        const cityMap = loadAirportData(airportCsvPath);
+
+        const browser = await puppeteerExtra.launch({ headless: false });
+        const page = await browser.newPage();
+        await page.setUserAgent(randomUseragent.getRandom());
+        await page.setViewport({ width: 1366, height: 900 });
+
+        await page.goto('https://www.kayak.com/explore/', { waitUntil: 'networkidle2' });
+        await humanDelay('long');
+
+        // reject cookies (same selector as kayakSc.js)
+        try {
+            await humanDelay('short');
+            const cookiesButton = await page.$('.P4zO-submit-buttons button:nth-child(3)');
+            if (cookiesButton) {
+                // click more human-like
+                const box = await cookiesButton.boundingBox();
+                if (box) {
+                    await page.mouse.move(box.x + rand(1, box.width-1), box.y + rand(1, box.height-1));
+                    await humanDelay('tiny');
+                    await page.mouse.click(box.x + box.width/2, box.y + box.height/2);
+                } else {
+                    await cookiesButton.click().catch(()=>{});
+                }
+                await humanDelay('short');
+            }
+        } catch (e) { /* ignore */ }
+
+        // Prepare output workbook (copy input, write to updated file)
+        const outFile = path.join(__dirname, 'assets', 'others', 'ready_sheets', 'updated_anywhere_flights_festival.xlsx');
+        let outWb = XLSX.readFile(inputXlsx);
+        let outSh = outWb.Sheets[outWb.SheetNames[0]];
+        let outData = XLSX.utils.sheet_to_json(outSh, { header: 1 });
+
+        if (!outData[0].includes('Price (USD)')) outData[0].push('Price (USD)');
+
+        for (let i = 0; i < entries.length; i++) {
+            const e = entries[i];
+            const rowIndex = i + 1; // account for header row
+
+            const parsedDate = parseCellDate(e.rawDate) || '';
+            console.log(`Processing ${e.cityDep} -> ${e.cityDest} date ${parsedDate || '(no parsed date)'} event ${e.event}`);
+
+            // Lookup destination IATA
+            let destMeta = cityMap.get(normalizeKey(e.cityDest));
+            if (!destMeta) {
+                for (const [k, v] of cityMap.entries()) {
+                    if (!k) continue;
+                    const nk = normalizeKey(e.cityDest);
+                    if (nk.includes(k) || k.includes(nk)) { destMeta = v; break; }
+                }
+            }
+            if (!destMeta || !destMeta.iata) {
+                console.log(`Skipping ${e.cityDest}: no IATA found.`);
+                outData[rowIndex] = outData[rowIndex] || [];
+                outData[rowIndex][outData[0].length - 1] = '';
+                outSh = XLSX.utils.aoa_to_sheet(outData);
+                outWb.Sheets[outWb.SheetNames[0]] = outSh;
+                XLSX.writeFile(outWb, outFile);
+                // Go back to form and continue
+                try { await goBackToForm(page); } catch(_) {}
+                await humanDelay('normal');
+                continue;
+            }
+
+            // 1) Fill origin input first
+            try {
+                await humanDelay('short');
+                const originSelectorVariants = [
+                    '.xGVG-location-inputs .xGVG-input:first-child input',
+                    '.xGVG-location-inputs input.NhpT',
+                    '.xGVG-location-inputs input',
+                    '.c4Gq3-input input.NhpT' // add c4Gq3 variant
+                ];
+                let originSel = null;
+                for (const s of originSelectorVariants) {
+                    const el = await page.$(s);
+                    if (el) { originSel = s; break; }
+                }
+                if (!originSel) originSel = '.xGVG-location-inputs input';
+
+                // new: reliable clear + type + handle c4Gq3 suggestion
+                await clearThenType(page, originSel, e.cityDep, { isC4: originSel.includes('c4Gq3') });
+                
+                // focus and clear
+                await page.click(originSel, { clickCount: 3 }).catch(()=>{});
+                await humanDelay('tiny');
+                await page.evaluate(sel => { const el = document.querySelector(sel); if (el) el.value = ''; }, originSel).catch(()=>{});
+                await humanDelay('tiny');
+                // human typing
+                await humanType(page, originSel, e.cityDep);
+                await humanDelay('short');
+
+                // If the input is the c4Gq3 variant we click the first list item instead of pressing Enter
+                if (originSel.includes('c4Gq3')) {
+                    // wait for suggestion list and click first li#smarty-list > li
+                    try {
+                        await page.waitForSelector('.c4Gq3-content ul#smarty-list li', { visible: true, timeout: 4000 });
+                        const firstOpt = await page.$('.c4Gq3-content ul#smarty-list li');
+                        if (firstOpt) {
+                            const b = await firstOpt.boundingBox();
+                            if (b) {
+                                await page.mouse.move(b.x + Math.floor(Math.random() * (b.width-4)) + 2, b.y + Math.floor(Math.random() * (b.height-4)) + 2);
+                                await humanDelay('tiny');
+                                await page.mouse.click(b.x + b.width/2, b.y + b.height/2);
+                            } else {
+                                await firstOpt.click().catch(()=>{});
+                            }
+                            await humanDelay('normal');
+                        } else {
+                            // fallback to Enter if no option found
+                            await page.keyboard.press('Enter');
+                            await humanDelay('normal');
+                        }
+                    } catch (err) {
+                        // fallback to Enter on timeout/error
+                        await page.keyboard.press('Enter');
+                        await humanDelay('normal');
+                    }
+                } else {
+                    // default behavior for xGVG inputs: press Enter
+                    await page.keyboard.press('Enter');
+                    await humanDelay('normal');
+                }
+            } catch (err) {
+                console.warn('origin input issue:', err.message);
+            }
+
+            // 2) THEN set dates (if parsed) - robust navigation and exact dates selection
+            if (parsedDate) {
+                try {
+                    await humanDelay('short');
+                    const dateBtn = await page.$('[aria-label="Select dates"], [aria-label="Dates"], .D4Yk');
+                    if (dateBtn) {
+                        console.log('Opening date picker...');
+                        await dateBtn.click().catch(()=>{});
+                        await page.waitForSelector('.or3C-wrapper, .sGVi-dropdown-content', { visible: true, timeout: 5000 }).catch(()=>{});
+                        await humanDelay('normal');
+
+                        // Select "Exact dates" radio button if present
+                        const exactDatesLabel = await page.$('label[for="exact-dates"], label[data-text="Exact dates"]');
+                        if (exactDatesLabel) {
+                            console.log('Selecting Exact dates...');
+                            await exactDatesLabel.click().catch(()=>{});
+                            await humanDelay('short');
+                        }
+
+                        // Navigate to November 2025 if needed
+                        let currentMonthCaption = await page.evaluate(() => {
+                            const cap = document.querySelector('.w0lb-month-name');
+                            return cap ? cap.textContent.trim() : '';
+                        });
+                        console.log('Current month:', currentMonthCaption);
+                        const targetMonth = 'November 2025';
+                        let attempts = 0;
+                        while (!currentMonthCaption.includes(targetMonth) && attempts < 10) {
+                            attempts++;
+                            const nextBtn = await page.$('div[aria-label="Next Month"], .c1fvi-mod-theme-button:not(.c1fvi-disabled)');
+                            if (nextBtn) {
+                                console.log('Clicking Next Month...');
+                                try {
+                                    const b = await nextBtn.boundingBox();
+                                    if (b) {
+                                        await page.mouse.move(b.x + rand(1, b.width-1), b.y + rand(1, b.height-1));
+                                        await humanDelay('tiny');
+                                        await page.mouse.click(b.x + b.width/2, b.y + b.height/2);
+                                    } else {
+                                        await nextBtn.click().catch(()=>{});
+                                    }
+                                } catch (e) { await nextBtn.click().catch(()=>{}); }
+                                await humanDelay('normal');
+                            } else {
+                                const prevBtn = await page.$('div[aria-label="Previous month"], .c1fvi-disabled');
+                                if (prevBtn && !await page.evaluate(el => el.getAttribute('aria-disabled') === 'true', prevBtn)) {
+                                    console.log('Clicking Previous Month...');
+                                    await prevBtn.click().catch(()=>{});
+                                    await humanDelay('normal');
+                                } else {
+                                    console.warn('Cannot navigate to target month:', targetMonth);
+                                    break;
+                                }
+                            }
+                            currentMonthCaption = await page.evaluate(() => {
+                                const cap = document.querySelector('.w0lb-month-name');
+                                return cap ? cap.textContent.trim() : '';
+                            });
+                            console.log('Updated month:', currentMonthCaption);
+                        }
+
+                        // Select start and end dates (festival fixed)
+                        const startLabel = 'November 6, 2025';
+                        const endLabel = 'November 10, 2025';
+                        const startBtn = await page.$(`div[aria-label="${startLabel}"], div[aria-label*="${startLabel}"]`);
+                        if (startBtn) {
+                            console.log('Selecting start date:', startLabel);
+                            try {
+                                const b = await startBtn.boundingBox();
+                                if (b) {
+                                    await page.mouse.move(b.x + rand(1, b.width-1), b.y + rand(1, b.height-1));
+                                    await humanDelay('tiny');
+                                    await page.mouse.click(b.x + b.width/2, b.y + b.height/2);
+                                } else {
+                                    await startBtn.click().catch(()=>{});
+                                }
+                            } catch (e) { await startBtn.click().catch(()=>{}); }
+                            await humanDelay('short');
+                        } else {
+                            console.warn('Start date button not found');
+                        }
+
+                        const endBtn = await page.$(`div[aria-label="${endLabel}"], div[aria-label*="${endLabel}"]`);
+                        if (endBtn) {
+                            console.log('Selecting end date:', endLabel);
+                            try {
+                                const b = await endBtn.boundingBox();
+                                if (b) {
+                                    await page.mouse.move(b.x + rand(1, b.width-1), b.y + rand(1, b.height-1));
+                                    await humanDelay('tiny');
+                                    await page.mouse.click(b.x + b.width/2, b.y + b.height/2);
+                                } else {
+                                    await endBtn.click().catch(()=>{});
+                                }
+                            } catch (e) { await endBtn.click().catch(()=>{}); }
+                            await humanDelay('short');
+                        } else {
+                            console.warn('End date button not found');
+                        }
+
+                        // Close date picker (Done/Apply)
+                        const doneSelectors = [
+                            '.RxNS-button-content',
+                            '.CjDg .RxNS-button-content',
+                            'button[data-test="datepicker-done"]',
+                            'button[aria-label*="Done"], button[aria-label*="Apply"]'
+                        ];
+                        let doneBtn = null;
+                        for (const sel of doneSelectors) {
+                            doneBtn = await page.$(sel);
+                            if (doneBtn) break;
+                        }
+                        if (doneBtn) {
+                            console.log('Clicking Done on date picker...');
+                            try {
+                                const b = await doneBtn.boundingBox();
+                                if (b) {
+                                    await page.mouse.move(b.x + rand(1, b.width-1), b.y + rand(1, b.height-1));
+                                    await humanDelay('tiny');
+                                    await page.mouse.click(b.x + b.width/2, b.y + b.height/2);
+                                } else {
+                                    await doneBtn.click().catch(()=>{});
+                                }
+                            } catch (e) { await doneBtn.click().catch(()=>{}); }
+                            await humanDelay('normal');
+                        } else {
+                            console.warn('Done button not found, trying Escape');
+                            await page.keyboard.press('Escape');
+                            await humanDelay('short');
+                        }
+                    } else {
+                        console.warn('Date picker button not found');
+                    }
+                } catch (err) {
+                    console.warn('date picker issue:', err.message);
+                }
+            }
+
+            // 3) THEN fill destination input
+            try {
+                await humanDelay('short');
+                const destSelectorVariants = [
+                    '.xGVG-location-inputs .xGVG-input:last-child input',
+                    '.xGVG-location-inputs input.NhpT:last-of-type',
+                    '.xGVG-location-inputs input'
+                ];
+                let destSel = null;
+                for (const s of destSelectorVariants) {
+                    const el = await page.$(s);
+                    if (el) { destSel = s; break; }
+                }
+                if (!destSel) destSel = '.xGVG-location-inputs input';
+                // new: reliable clear + type + handle c4Gq3 suggestion for destination
+                await clearThenType(page, destSel, e.cityDest, { isC4: destSel.includes('c4Gq3') });
+                
+                await page.click(destSel, { clickCount: 3 }).catch(()=>{});
+                await humanDelay('tiny');
+                await page.evaluate(sel => { const el = document.querySelector(sel); if (el) el.value = ''; }, destSel).catch(()=>{});
+                await humanDelay('tiny');
+                await humanType(page, destSel, e.cityDest);
+                await humanDelay('short');
+                await page.keyboard.press('Enter');
+                await humanDelay('normal');
+            } catch (err) {
+                console.warn('dest input issue:', err.message);
+            }
+
+            // Click Search
+            try {
+                await humanDelay('short');
+                const searchBtn = await page.$('button[type="submit"], button[aria-label="Search"], button[data-test="search-button"]');
+                if (searchBtn) { 
+                    console.log('Clicking Search...');
+                    const b = await searchBtn.boundingBox();
+                    if (b) {
+                        await page.mouse.move(b.x + rand(1, b.width-1), b.y + rand(1, b.height-1));
+                        await humanDelay('tiny');
+                        await page.mouse.click(b.x + b.width/2, b.y + b.height/2);
+                    } else {
+                        await searchBtn.click().catch(()=>{});
+                    }
+                    await humanDelay('veryLong'); 
+                } else {
+                    console.warn('Search button not found, waiting...');
+                    await humanDelay('veryLong');
+                }
+            } catch (err) {
+                console.warn('search click/wait issue:', err.message);
+                await humanDelay('veryLong');
+            }
+
+            // Extract price - wait for results
+            let price = '';
+            try {
+                await page.waitForSelector('.MU1_-content, .wMQR-header', { timeout: 12000 }).catch(() => {
+                    console.warn('Results page not loaded in time');
+                });
+                await humanDelay('short');
+                price = await page.evaluate(() => {
+                    const selectors = [
+                        '.f8F9-price', '.price', '.resultPrice', '.ksr-price', '.gws-price',
+                        '.MU1_-content .price', '.resultsList .price', '.wMQR-header'
+                    ];
+                    for (const s of selectors) {
+                        const el = document.querySelector(s);
+                        if (!el) continue;
+                        const txt = (el.textContent || el.innerText || '').replace(/\s+/g,' ');
+                        const m = txt.match(/\$?\s*([0-9]{1,3}(?:[,.][0-9]{3})*(?:[,.][0-9]+)?)/);
+                        if (m) return m[1].replace(/,/g,'').replace(/\s/g,'');
+                    }
+                    const all = document.body.innerText || '';
+                    const m = all.match(/\$\s*([0-9]{2,6})/);
+                    return m ? m[1] : '';
+                });
+                console.log(`Extracted price for ${e.cityDep} -> ${e.cityDest}: $${price || 'N/A'}`);
+            } catch (err) {
+                console.warn('price extraction issue:', err.message);
+                price = '';
+            }
+
+            outData[rowIndex] = outData[rowIndex] || [];
+            outData[rowIndex][outData[0].length - 1] = price || '';
+
+            // write progress after each row
+            outSh = XLSX.utils.aoa_to_sheet(outData);
+            outWb.Sheets[outWb.SheetNames[0]] = outSh;
+            XLSX.writeFile(outWb, outFile);
+
+            // Go back to form using the back button (replaces full reload)
+            try {
+                await goBackToForm(page);
+                await humanDelay('normal');
+            } catch (err) {
+                console.warn('goBackToForm failed:', err.message);
+            }
+
+            // small jitter before next iteration
+            await humanDelay('short');
+        } // end loop
+
+        await browser.close();
+        console.log('Done — updated file:', outFile);
+    } catch (err) {
+        console.error('Fatal:', err && err.message ? err.message : err);
+    }
+})();
+
+---
+
+## Fichiers JS dans le dossier scripts ##
+
+### Fichier: csvReader.js ###
+
+const fs = require('fs');
+const path = require('path');
+const { parse } = require('csv-parse/sync');
+
+function readCsvSync(filePath) {
+  const abs = path.isAbsolute(filePath) ? filePath : path.join(__dirname, '..', filePath);
+  if (!fs.existsSync(abs)) {
+    console.error('CSV not found at', abs);
+    return [];
+  }
+  let txt = fs.readFileSync(abs, 'utf8');
+  // quick raw preview
+  const rawHead = txt.split(/\r?\n/).slice(0,6).join('\n');
+  console.log('CSV preview (first lines):\n', rawHead);
+
+  // try parse with header columns:true
+  let records = [];
+  try {
+    records = parse(txt, { columns: true, skip_empty_lines: true, trim: true });
+    console.log('Parsed rows:', records.length);
+    if (records.length > 0) {
+      // log sample object keys and first 5 rows
+      console.log('Sample keys:', Object.keys(records[0]).slice(0,20));
+      console.log('First 5 parsed rows:', records.slice(0,5));
+    }
+  } catch (err) {
+    console.error('csv-parse error:', err && err.message);
+    // fallback: try parse without columns to inspect raw columns
+    try {
+      const raw = parse(txt, { relax_column_count: true, skip_empty_lines: true });
+      console.log('Fallback raw parse rows:', raw.length);
+      console.log('First 5 raw rows:', raw.slice(0,5));
+    } catch (er2) {
+      console.error('Fallback parse failed:', er2 && er2.message);
+    }
+  }
+  return records;
+}
+
+module.exports = { readCsvSync };
+
+---
+
+### Fichier: scriptKay.js ###
+
+let citiesDepList =  [ 'Sarajevo',   'Sofia', 'Nicosia']
+let countriesDepList = ['Bosnia and Herzegovina ',
+  'Bulgaria ',
+  'Cyprus '
+]
+
+
+
+for (let z = 0; z < 3; z++) {
+
+
+    //             // Using page.evaluate to open a new window 
+            let dataTicket = async (cityDepInputFile, countryDepInputFile) => {
+
+                let cardList;
+                let cardDetail;
+                let city;
+                let priceFrom;
+                let country;
+                let date;
+                let card;
+                let arr2 = [];
+                let buttonSeemore;
+                let container;
+                let subCardListSize;
+                let divDurations 
+                let allButtons 
+                let dropdownValueSelected
+
+                let delay =  ms => new Promise(resolve => setTimeout(resolve, ms));
+
+                await delay(7630)
+
+                let inpp = document.querySelectorAll("._ibT")[0]
+                let getIdFromChild = inpp.children[0].id
+
+                const parts = getIdFromChild.split("-");
+
+                // Take the first value
+                const firstValue = parts[0];
+                firstValue
+
+                let inputFound = document.querySelector(`#${firstValue}-origin`)
+
+                const clickEvent = new MouseEvent('click', {
+                    bubbles: true,  // Whether the event bubbles up through the DOM
+                    cancelable: true,  // Whether the event can be canceled
+                });
+
+                const mousedownEvent = new MouseEvent("mousedown", {
+                    bubbles: true,
+                    cancelable: true,
+                    button: 0, // Left mouse button
+                    buttons: 1,
+                });
+                
+                // Create a mouseup event for left-click
+                const mouseupEvent = new MouseEvent("mouseup", {
+                    bubbles: true,
+                    cancelable: true,
+                    button: 0, // Left mouse button
+                    buttons: 1,
+                });
+
+
+                let coockies = await document.querySelectorAll(".c1yxs.c1yxs-mod-visible")
+                if(coockies.length > 0) await document.querySelectorAll(".P4zO-submit-buttons")[0].children[2].dispatchEvent(clickEvent)
+
+                await inpp.dispatchEvent(clickEvent);
+
+                await delay(4000)
+
+                inputFound.value = ""
+
+                const text = cityDepInputFile.trim();
+
+                // Iterate over each character in the string
+                if (typeof text === 'string') {
+                    for (const char of text) {
+                        // Create a keydown event for each character
+                        const keyEvent = await new KeyboardEvent("keydown", {
+                        key: char, // The actual key (e.g., 'h', 'e', etc.)
+                        char: char,
+                        keyCode: char.charCodeAt(0), // ASCII code of the character
+                        which: char.charCodeAt(0), // ASCII code of the character
+                        bubbles: true, // Ensures the event bubbles up the DOM
+                        cancelable: true, // Allows the event to be canceled
+                        });
+
+                        // Dispatch the event to the input field
+                        await inputFound.dispatchEvent(keyEvent);
+
+                        inputFound.value += await char;
+
+                    // Wait for 500 milliseconds before typing the next character
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                    }
+                }
+
+                    await new Promise(resolve => setTimeout(resolve, 1300));
+                    inputFound.dispatchEvent(mousedownEvent);
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                    inputFound.dispatchEvent(mouseupEvent);
+                    await new Promise(resolve => setTimeout(resolve, 300));
+
+                    dropdownValueSelected = document.querySelectorAll(`#${firstValue}-origin-smartbox-dropdown li`)[0]
+
+                    
+                    await delay(1650)
+                    
+                    // click open dropdown for month
+                    dropdownValueSelected.dispatchEvent(clickEvent)
+                    await delay(1650)
+                    //////============= RAnge durations
+                    divDurations = await document.querySelector(`#${firstValue}-dateRangeInput-display-start-inner`)
+                    await divDurations.dispatchEvent(clickEvent);
+                    await delay(1650)
+                    allButtons = await  document.querySelector(`#${firstValue}-datePicker-rangeRadioBtnSet`).querySelectorAll("._iax")[0].click();
+                    
+
+                    // loop simulate click month
+                    for (let f = 0; f < 3; f++) {
+
+
+                        await delay(1650)
+                        allButtons = await  document.querySelector(`#${firstValue}-datePicker-rangeRadioBtnSet`).querySelectorAll("._iax");
+                        await delay(1000)
+                        await allButtons[f].click()
+                        await delay(2650)
+
+                        ///// Simulate buttonclick 3 times
+                        for (let i = 0; i < 1; i++) {
+
+                            buttonSeemore = await document.querySelectorAll(".xzUt-button-content")[1] 
+                            await buttonSeemore.dispatchEvent(clickEvent)   
+                            await delay(1400)
+                        }
+
+                        container = await document.querySelectorAll(".anywhere-drawer")[0];
+                        cardList = await  container.children[0].children[0].children[3]
+                        
+                        await delay(1000)  
+
+                        ///// Loop select group of card
+                        for (let h = 0; h < 1; h++) {
+
+                            subCardListSize = await cardList.children[h].children[0].children.length
+                            ///// Loop take data from card
+                            for (let j = 0; j < subCardListSize; j++) {
+
+                                card = await  cardList.children[h].children[0].querySelectorAll("._t")[j]
+                                cardDetail = await  card.querySelectorAll("._eY")[0] ;
+                                city = await  cardDetail.querySelectorAll("._ihz")[0].children[0]
+                                if(city.textContent.includes("anything")) continue;
+                                priceFrom = await  cardDetail.querySelectorAll("._ihz")[0].children[1]
+                                country = await  cardDetail.querySelectorAll("._ibU")[0].children[0]
+                                date = await  cardDetail.querySelectorAll("._ibU")[0].children[1]
+                                priceFrom = priceFrom == undefined ? "N/A" : priceFrom.innerText;
+
+                                const result = parseDateRange(date.innerText);
+                                console.log("country in website", country.innerText);
+
+                                arr2.push({cityDep: cityDepInputFile,
+                                    countryDep: countryDepInputFile,
+                                    cityDest: city.innerText, 
+                                    countryDest: country.innerText, 
+                                    priceFrom: priceFrom, 
+                                    date: date.innerText, 
+                                    depDay: result[0].depDay, 
+                                    depMonth: result[0].depMonth, 
+                                    retDay: result[0].retDay, 
+                                    retMonth: result[0].retMonth
+                                });
+                            }
+                        }
+                        function parseDateRange(input) {
+                            const months = {
+                                Jan: "01", Feb: "02", Mar: "03", Apr: "04", May: "05", Jun: "06",
+                                Jul: "07", Aug: "08", Sep: "09", Oct: "10", Nov: "11", Dec: "12"
+                              };
+
+                            
+                            // Remove all periods from the input string
+                            const cleanedInput = input.replaceAll('.', '');
+                          
+                            // Split the cleaned input into parts
+                            const parts = cleanedInput.split(' - ');
+                            const [depPart, retPart] = parts;
+                          
+                            // Extract date components
+                            const [, depMonth, depDay] = depPart.split(' ');
+                            const [, retMonth, retDay] = retPart.split(' ');
+                             
+                            
+                            return [{
+                              depDay: parseInt(depDay),
+                              depMonth: months[depMonth],
+                              retDay: parseInt(retDay),
+                              retMonth: months[retMonth]
+                            }]
+                      }
+
+                    }
+                    await delay(2200)  
+    
+                }
+                 await dataTicket( citiesDepList[z], countriesDepList[z]); // Example URL for window.open
+            
+    
+
+            }
+
+---
+
+### Fichier: serverRecorder.js ###
+
+// Remplace l'ancien serverRecorder.js — utilise Playwright pour l'enregistrement vidéo vertical (TikTok)
+const express = require('express');
+const path = require('path');
+const fs = require('fs');
+const { parse } = require('csv-parse/sync');
+const puppeteer = require('puppeteer');
+const { PuppeteerScreenRecorder } = require('puppeteer-screen-recorder');
+const ffmpegPath = require('ffmpeg-static');
+const countries = require('i18n-iso-countries');
+try { countries.registerLocale(require('i18n-iso-countries/langs/en.json')); } catch(e) {}
+
+// common name fixes for names that i18n-iso-countries doesn't resolve reliably
+const COMMON_COUNTRY_ALIASES = {
+  'uk': 'gb',
+  'united kingdom': 'gb',
+  'great britain': 'gb',
+  'russia': 'ru',
+  'south korea': 'kr',
+  'north korea': 'kp',
+  'united states': 'us',
+  'usa': 'us',
+  'u.s.': 'us',
+  'czechia': 'cz',
+  'czech republic': 'cz',
+  'ivory coast': 'ci',
+  'vatican': 'va',
+  'laos': 'la',
+  'viet nam': 'vn',
+  'brunei darussalam': 'bn'
+};
+
+function countryNameToAlpha2(name) {
+  if (!name) return '';
+  const raw = String(name).trim();
+  if (!raw) return '';
+
+  const s = raw.toLowerCase();
+
+  // quick alias map (keeps your existing aliases)
+  const COMMON_COUNTRY_ALIASES = {
+    'uk': 'gb','united kingdom': 'gb','great britain': 'gb',
+    'russia': 'ru','south korea': 'kr','north korea': 'kp',
+    'united states': 'us','usa': 'us','u.s.': 'us',
+    'czechia': 'cz','czech republic': 'cz','ivory coast': 'ci',
+    'vatican': 'va','laos': 'la','viet nam': 'vn','brunei darussalam': 'bn'
+  };
+  if (COMMON_COUNTRY_ALIASES[s]) return COMMON_COUNTRY_ALIASES[s];
+
+  // 1) try library helper functions if available
+  try {
+    if (typeof countries.getAlpha2 === 'function') {
+      const res = countries.getAlpha2(raw, 'en');
+      if (res) return String(res).toLowerCase();
+    }
+    if (typeof countries.getAlpha2Code === 'function') {
+      const res = countries.getAlpha2Code(raw, 'en');
+      if (res) return String(res).toLowerCase();
+    }
+  } catch (e) {
+    // ignore and fallback to names scanning
+  }
+
+  // 2) try cleaned variants
+  const cleaned = s.replace(/\(.+?\)/g, '').replace(/['’]/g, '').replace(/&/g, 'and').trim();
+  if (COMMON_COUNTRY_ALIASES[cleaned]) return COMMON_COUNTRY_ALIASES[cleaned];
+  try {
+    if (typeof countries.getAlpha2 === 'function') {
+      const r2 = countries.getAlpha2(cleaned, 'en');
+      if (r2) return String(r2).toLowerCase();
+    }
+    if (typeof countries.getAlpha2Code === 'function') {
+      const r2 = countries.getAlpha2Code(cleaned, 'en');
+      if (r2) return String(r2).toLowerCase();
+    }
+  } catch(e) {}
+
+  // 3) fallback: scan the library names (robust)
+  try {
+    const all = countries.getNames && typeof countries.getNames === 'function' ? countries.getNames('en') : null;
+    if (all) {
+      for (const code in all) {
+        const nm = String(all[code]).toLowerCase();
+        if (nm === s || nm.includes(s) || s.includes(nm)) return code.toLowerCase();
+      }
+    }
+  } catch (e) {}
+
+  // 4) final fallback: try simple heuristics from the input (take last word, etc.)
+  const parts = s.split(/[,\/\-]/).map(p=>p.trim()).filter(Boolean);
+  for (const p of parts) {
+    try {
+      const all = countries.getNames && countries.getNames('en');
+      if (all) {
+        for (const code in all) {
+          const nm = String(all[code]).toLowerCase();
+          if (nm === p || nm.includes(p) || p.includes(nm)) return code.toLowerCase();
+        }
+      }
+    } catch(e){}
+  }
+
+  return '';
+}
+
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+const csvPath = path.join(__dirname, '..', 'assets', 'others', 'final_result_sheets', 'allCitiesmerged.csv');
+const outDir = path.join(__dirname, '..', 'recordings');
+if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
+
+// timings
+const animationDurationMs = process.env.ANIMATION_MS ? parseInt(process.env.ANIMATION_MS, 10) : 10000;
+const postScrollDelayMs = process.env.POST_SCROLL_MS ? parseInt(process.env.POST_SCROLL_MS, 10) : 2000;
+// record duration default -> 15000ms (15s)
+const recordDurationMs = process.env.RECORD_MS ? parseInt(process.env.RECORD_MS, 10) : 15000;
+
+// capture frame
+const FRAME_WIDTH = process.env.FRAME_WIDTH ? parseInt(process.env.FRAME_WIDTH, 10) : 1080;
+const FRAME_HEIGHT = process.env.FRAME_HEIGHT ? parseInt(process.env.FRAME_HEIGHT, 10) : 1920;
+
+function normalizeRowKeys(row) {
+  const lc = {};
+  for (const k of Object.keys(row || {})) {
+    const kk = String(k || '').trim().toLowerCase();
+    let v = row[k];
+    if (v == null) v = '';
+    else if (typeof v === 'string') v = v.trim();
+    lc[kk] = v;
+  }
+  const pick = (...names) => {
+    for (const n of names) {
+      const key = String(n).trim().toLowerCase();
+      if (key in lc && lc[key] !== '') return lc[key];
+    }
+    return '';
+  };
+  const normalized = {
+    cityDep: pick('citydep', 'city_dep', 'from', 'departure'),
+    countryDep: pick('countrydep', 'country_dep', 'countrydep', 'country'),
+    cityDest: pick('citydest', 'city_dest', 'to', 'destination'),
+    countryDest: pick('countrydest', 'country_dest', 'country'),
+    IATA: pick('iata'),
+    depIATA: pick('depiata', 'dep_iata'),
+    priceFrom: pick('pricefrom', 'price_from', 'price'),
+    date: pick('date'),
+    depDay: pick('depday', 'dep_day'),
+    depMonth: pick('depmonth', 'dep_month'),
+    retDay: pick('retday', 'ret_day'),
+    retMonth: pick('retmonth', 'ret_month'),
+    tripUrl: pick('tripurl', 'trip_url', 'url')
+  };
+  if (normalized.priceFrom !== '') {
+    normalized.priceFrom = Number(String(normalized.priceFrom).replace(/[^\d.-]/g, '')) || 0;
+  }
+  return normalized;
+}
+
+function extractMonthKey(row) {
+  // try to find ddate=YYYY-MM-DD in tripUrl (possibly urlencoded)
+  const u = (row.tripUrl || '') + '';
+  const m1 = u.match(/ddate%3D(\d{4})-(\d{2})-\d{2}/);
+  if (m1) return `${m1[1]}-${m1[2]}`;
+  const m2 = u.match(/ddate=(\d{4})-(\d{2})-\d{2}/);
+  if (m2) return `${m2[1]}-${m2[2]}`;
+  // fallback: use depMonth with current year
+  const depMonth = Number(row.depMonth || (row.date || '').replace(/.*-.*(\d{2})$/,''));
+  const year = new Date().getFullYear();
+  if (depMonth && depMonth > 0 && depMonth <= 12) {
+    return `${year}-${String(depMonth).padStart(2,'0')}`;
+  }
+  // last fallback: current month
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2,'0')}`;
+}
+
+function buildDeparturesMap(records) {
+  const map = new Map();
+  for (const r of records) {
+    const dep = (r.cityDep || '').toString().trim();
+    if (!dep) continue;
+    const monthKey = extractMonthKey(r);
+    const destCountryCode = countryNameToAlpha2(r.countryDest) || countryNameToAlpha2(r.countryDep) || '';
+    const rowForClient = {
+      cityDep: r.cityDep,
+      countryDep: r.countryDep,
+      cityDest: r.cityDest,
+      countryDest: r.countryDest,
+      destCountryCode,         // alpha2 lowercase or ''
+      priceFrom: r.priceFrom ? Number(r.priceFrom) : null,
+      date: r.date,
+      tripUrl: r.tripUrl
+    };
+    if (!map.has(dep)) map.set(dep, {});
+    const months = map.get(dep);
+    if (!months[monthKey]) months[monthKey] = [];
+    months[monthKey].push(rowForClient);
+  }
+  // sort each month's rows by ascending price (nulls pushed to end)
+  for (const [dep, months] of map.entries()) {
+    for (const m in months) {
+      months[m].sort((a, b) => {
+        const pa = (a.priceFrom == null) ? Number.POSITIVE_INFINITY : Number(a.priceFrom);
+        const pb = (b.priceFrom == null) ? Number.POSITIVE_INFINITY : Number(b.priceFrom);
+        return pa - pb;
+      });
+    }
+  }
+  return map;
+}
+
+async function readCsv() {
+  try {
+    const txt = fs.readFileSync(csvPath, 'utf8');
+    const parsed = parse(txt, { columns: true, skip_empty_lines: true });
+    const normalized = parsed.map(normalizeRowKeys);
+    return normalized;
+  } catch (e) {
+    console.error('CSV read error', e && e.message);
+    return [];
+  }
+}
+
+(async () => {
+  console.log('Target capture frame:', FRAME_WIDTH, 'x', FRAME_HEIGHT);
+  console.log('Timings:', { animationDurationMs, postScrollDelayMs, recordDurationMs });
+
+  const raw = await readCsv();
+  console.log('CSV read OK — rows:', Array.isArray(raw) ? raw.length : 'not-array');
+  if (!Array.isArray(raw) || !raw.length) {
+    console.warn('No CSV rows found — server will start but no departures available');
+  }
+  const departuresMap = buildDeparturesMap(raw);
+  console.log('Built map — departures count:', departuresMap.size);
+
+  const app = express();
+  app.use(express.static(path.join(__dirname, '..')));
+
+  app.get('/data', (req, res) => {
+    const city = (req.query.city || '').trim().toLowerCase();
+    if (!city) return res.json({ departure: '', months: {} });
+    // find exact match ignoring case
+    let matchKey = null;
+    for (const k of departuresMap.keys()) {
+      if (k.toString().trim().toLowerCase() === city) { matchKey = k; break; }
+    }
+    if (!matchKey) {
+      // try partial match
+      for (const k of departuresMap.keys()) {
+        if (k.toString().toLowerCase().includes(city)) { matchKey = k; break; }
+      }
+    }
+    if (!matchKey) return res.json({ departure: '', months: {} });
+    return res.json({ departure: matchKey, months: departuresMap.get(matchKey) || {} });
+  });
+
+  const server = app.listen(PORT, () => {
+    console.log('Server running http://localhost:' + PORT);
+  });
+
+  // Recording with Puppeteer
+  // headless flag must be defined before use
+  const headless = process.env.HEADLESS ? process.env.HEADLESS === 'true' : false;
+  // Desktop mode (reproduce votre navigateur viewport). Utilisez l'environnement BROWSER_WIDTH/BROWSER_HEIGHT ou revenez à SCREEN_WIDTH.
+  // Desktop mode (reproduce votre navigateur viewport). Utilisez l'environnement BROWSER_WIDTH/BROWSER_HEIGHT ou revenez à SCREEN_WIDTH.
+  const BROWSER_WIDTH = process.env.BROWSER_WIDTH ? parseInt(process.env.BROWSER_WIDTH, 10) : 776; // Changed: Default to 776
+  const BROWSER_HEIGHT = process.env.BROWSER_HEIGHT ? parseInt(process.env.BROWSER_HEIGHT, 10) : 1021; // Changed: Default to 1021
+  const DEVICE_SCALE = process.env.DEVICE_SCALE ? Number(process.env.DEVICE_SCALE) : 1;
+  const EMULATE_MOBILE = false; // bureau par défaut
+  console.log('Lancement de Puppeteer — sans tête :', headless, 'fenêtre du navigateur :', BROWSER_WIDTH + 'x' + BROWSER_HEIGHT, 'échelle de l’appareil :', DEVICE_SCALE);
+   // defaultViewport:null so Chromium window follows --window-size; DO NOT force fullscreen
+   const browser = await puppeteer.launch({
+     headless: headless,
+     defaultViewport: null,
+     args: [
+       '--no-sandbox',
+       '--disable-setuid-sandbox',
+       `--window-size=${BROWSER_WIDTH},${BROWSER_HEIGHT}`,
+       `--force-device-scale-factor=${DEVICE_SCALE}`
+     ]
+   });
+
+  // ensure a first blank tab and a second "URL" tab (we will reuse the second tab for all navigations)
+  // close any default pages to start clean
+  const initialPages = await browser.pages();
+  for (const p of initialPages) {
+    try { await p.close(); } catch (e) {}
+  }
+  // first tab: keep empty (about:blank)
+  const blankTab = await browser.newPage();
+  await blankTab.goto('about:blank');
+  // second tab: will display the big URL then navigate to the real page
+  const urlTab = await browser.newPage();
+  await urlTab.goto('about:blank');
+
+  try {
+    const departures = Array.from(departuresMap.keys());
+    console.log('Départs à traiter :', departures.length);
+    const DEBUG_LIMIT = process.env.DEBUG_LIMIT ? parseInt(process.env.DEBUG_LIMIT, 10) : 0;
+    const toProcess = DEBUG_LIMIT > 0 ? departures.slice(0, DEBUG_LIMIT) : departures;
+
+    for (const depCity of toProcess) {
+      console.log('--- start processing:', depCity);
+      try {
+            // reuse prepared second tab (urlTab)
+            const page = urlTab;
+            try { await page.bringToFront(); } catch (e) {}
+            await page.setUserAgent(EMULATE_MOBILE
+              ? 'Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.0 Mobile/15E148 Safari/604.1'
+              : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36'
+            );
+            await page.setViewport({ width: BROWSER_WIDTH, height: BROWSER_HEIGHT, deviceScaleFactor: DEVICE_SCALE, isMobile: !!EMULATE_MOBILE, hasTouch: !!EMULATE_MOBILE });
+            const targetUrl = `http://localhost:${PORT}/index_for_video.html?city=${encodeURIComponent(depCity)}&frameW=${FRAME_WIDTH}&frameH=${FRAME_HEIGHT}`;
+            console.log('Showing big url then navigating to', targetUrl, 'viewport:', BROWSER_WIDTH + 'x' + BROWSER_HEIGHT, 'dpr:', DEVICE_SCALE);
+            // show big url briefly
+            const bigHtml = `
+              <!doctype html>
+              <html><head><meta name="viewport" content="width=device-width,initial-scale=1"><style>
+              html,body{height:100%;margin:0;background:#0b0b0b;display:flex;align-items:center;justify-content:center}
+              .big-url{color:#fff;font-size:28px;font-weight:700;text-align:center;padding:20px;border-radius:12px;background:rgba(255,255,255,0.06);max-width:90%;word-break:break-all}
+              </style></head><body><div class="big-url">${targetUrl}</div></body></html>
+            `;
+            await page.setContent(bigHtml, { waitUntil: 'domcontentloaded' });
+            await page.waitForTimeout(700);
+            // navigate to actual page
+            await page.goto(targetUrl, { waitUntil: 'networkidle0' });
+
+            // Wait for readiness: prefer window.__carouselReady but fallback to presence of card slots
+            const readyTimeout = 15000;
+            try {
+              await Promise.race([
+                page.waitForFunction(() => window.__carouselReady === true, { timeout: readyTimeout }).catch(()=>{ throw new Error('no-ready-flag'); }),
+                page.waitForSelector('.carousel-wrapper .card-slot', { timeout: readyTimeout }).catch(()=>{ throw new Error('no-slot'); })
+              ]);
+              console.log('Page signaled ready or card-slot detected');
+            } catch (waitErr) {
+              console.warn('Ready signal timeout or error:', waitErr.message || waitErr);
+              // capture debug screenshot + html
+              try {
+                const debugShot = path.join(outDir, `${depCity.replace(/[\\/:*?"<>|]/g, '_')}_debug.png`);
+                await page.screenshot({ path: debugShot, fullPage: false });
+                console.log('Saved debug screenshot ->', debugShot);
+              } catch (sErr) {
+                console.warn('Could not save debug screenshot:', sErr && sErr.message);
+              }
+            }
+
+            // ensure animations active
+            await page.evaluate(() => {
+              document.querySelectorAll('.carousel-wrapper, .wrapper').forEach(w => w.classList.add('animating'));
+            });
+
+            // small delay to stabilise
+            await page.waitForTimeout(animationDurationMs + postScrollDelayMs);
+
+            // Determine body size and set viewport to body bounding box so we record only the body area
+            let recordWidth = FRAME_WIDTH;
+            let recordHeight = FRAME_HEIGHT;
+            try {
+              const bodyBox = await page.evaluate(() => {
+                const b = document.body;
+                const d = document.documentElement;
+                const w = Math.max(b.scrollWidth, d.scrollWidth, b.offsetWidth, d.offsetWidth);
+                const h = Math.max(b.scrollHeight, d.scrollHeight, b.offsetHeight, d.offsetHeight);
+                return { w: Math.max(1, Math.round(w)), h: Math.max(1, Math.round(h)) };
+              });
+              // clamp to reasonable max to avoid huge recordings
+              const MAX_W = 3840, MAX_H = 3840;
+              recordWidth = Math.min(bodyBox.w, MAX_W);
+              recordHeight = Math.min(bodyBox.h, MAX_H);
+              // set page viewport to body size so the recorder captures only the body
+              await page.setViewport({ width: recordWidth, height: recordHeight, deviceScaleFactor: 1 });
+              console.log('Adjusted viewport to body size for recording:', recordWidth + 'x' + recordHeight);
+            } catch (e) {
+              console.warn('Could not adjust viewport to body size, fallback to FRAME size:', e && e.message);
+              recordWidth = FRAME_WIDTH;
+              recordHeight = FRAME_HEIGHT;
+              await page.setViewport({ width: recordWidth, height: recordHeight, deviceScaleFactor: 1 });
+            }
+
+            const recorder = new PuppeteerScreenRecorder(page, {
+              followNewTab: true,
+              fps: 25,
+              // use the computed body size for recording
+              videoFrame: { width: recordWidth, height: recordHeight },
+              ffmpeg_path: ffmpegPath
+            });
+
+            const safeName = depCity.replace(/[\\/:*?"<>|]/g, '_') + `_${recordWidth}x${recordHeight}.mp4`;
+            const outPath = path.join(outDir, safeName);
+
+            console.log(`Recording period start (${recordDurationMs}ms) -> ${outPath}`);
+            await recorder.start(outPath);
+            await page.waitForTimeout(recordDurationMs);
+            await recorder.stop();
+
+            // DO NOT close urlTab (we reuse it). Only close if we opened a different temp page.
+            console.log('Saved video ->', outPath);
+          } catch (err) {
+            console.error('Error processing', depCity, err && err.stack || err);
+          }
+          console.log('--- finished processing:', depCity);
+        }
+  } finally {
+    await browser.close();
+    server.close(() => {
+      console.log('Serveur fermé');
+    });
+  }
+})().catch(e => {
+  console.error('Erreur fatale', e && e.stack || e);
+  process.exit(1);
+});
+
+---
+
+### Fichier: webscrapFlight.js ###
+
+//1 - //https://www.skyscanner.fr/transport/vols/nyo/cope/?adultsv2=1&cabinclass=economy&childrenv2=&ref=home&rtn=1&preferdirects=false&outboundaltsenabled=false&inboundaltsenabled=false&oym=2501&iym=2501&selectedoday=01&selectediday=01
+
+//2 - detect days in calendars :
+
+let  depCal = document.querySelectorAll(".BpkCalendar_bpk-calendar__ZmU5M")[0]
+let retCal = document.querySelectorAll(".BpkCalendar_bpk-calendar__ZmU5M")[1]
+const clickEvent = new MouseEvent('click', {
+	bubbles: true,  // Whether the event bubbles up through the DOM
+	cancelable: true,  // Whether the event can be canceled
+});
+
+let inCal 
+let week1
+let friday
+let inCal2
+let week2 
+let monday 
+let price;
+let link;
+
+if(depCal && retCal){
+	
+	await new Promise(resolve => setTimeout(resolve, 2000));
+	const modal = await document.querySelector("#modal-container");
+	if (modal) modal.style.display = "none";
+
+	
+
+	await new Promise(resolve => setTimeout(resolve, 1000));
+	const checkbox = await document.querySelector(".BpkCheckbox_bpk-checkbox__input__MTRlM");
+	if (checkbox) checkbox.dispatchEvent(clickEvent);;
+
+	const depCal = await document.querySelectorAll(".BpkCalendarGrid_bpk-calendar-grid__YjU0O")[0].children[0];
+	let week1 = await depCal.children[1];
+	let friday = await week1.children[4].children[0]; // Using .children for commented code
+	
+
+	const retCal = await document.querySelectorAll(".BpkCalendarGrid_bpk-calendar-grid__YjU0O")[1].children[0];
+	let retCalCal = await retCal.children[1];
+	let week2 = await retCalCal.children[2];
+	let monday = await week2.children[0].children[0]; // Using .children for commented code
+	console.log("tooo fast")
+	const continueButton = await  document.querySelector(".month-view-variant__trip-summary-cta");
+	
+
+
+	await new Promise(resolve => setTimeout(resolve, 1700));
+	if (friday) friday.dispatchEvent(clickEvent); // Uncommented
+	await new Promise(resolve => setTimeout(resolve, 2300));
+	if (monday) monday.dispatchEvent(clickEvent); // Uncommented
+	await new Promise(resolve => setTimeout(resolve, 1000));
+	// if (continueButton) continueButton.dispatchEvent(clickEvent); // Uncommented
+
+}
+
+//3 -  
+
+let filterTab = document.querySelectorAll(".FqsTabs_fqsTabsWithSparkle__YWVmY")[0];
+let secondTab = document.querySelectorAll(".BpkSegmentedControl_bpk-segmented-control__NzJjZ")[1];
+let prices;
+let links; 
+let dataTicket = [] ;
+let cardResults = document.querySelectorAll(".FlightsResults_dayViewItems__ZmU3Z")[0];
+
+
+if(filterTab && secondTab){
+	secondTab.dispatchEvent(clickEvent);
+	if(cardResults){
+
+		setTimeout(() => {
+			for (let index = 0; index < 4; index++) {
+
+				if(cardResults.children[index]){
+					
+					links = cardResults.children[index].querySelectorAll("a")[1]
+					prices = cardResults.children[index].querySelectorAll(".BpkTicket_bpk-ticket__stub__ZWNhZ")[0].children[0].children[1].innerText;
+
+					if(links == undefined){
+						continue;
+					}else{
+						dataTicket.push({price: prices, link: links.href})
+					}
+					
+				}
+				
+			}
+
+		}, 2000);
+	}
+}
+
+// 4
+let dataaAgencies= [] ;
+let cardAgenciesResult = document.querySelectorAll(".DetailsPanelContent_agentsListContainer__Zjc3N")[0];
+let priceAgency ;
+let agency ;
+
+for (let index = 0; index < 4; index++) {
+
+	if(cardAgenciesResult.children.length > 0){
+		
+		priceAgency = document.querySelectorAll(".TotalPrice_totalPrice__YmQyY")[index].innerText
+		agency = document.querySelectorAll(".AgentDetails_agentNameContainer__M2Q4M p")[index].innerText
+		dataaAgencies.push({agency: agency, priceAgency: priceAgency})
+	}
+	
+}
+
+---
+

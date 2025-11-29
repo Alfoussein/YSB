@@ -1,0 +1,37 @@
+{
+  "name": "webscrapflight",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "record": "node scripts/serverRecorder.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "2captcha": "^3.0.5-2",
+    "csv-parse": "^6.1.0",
+    "csv-parser": "^3.2.0",
+    "csv-writer": "^1.6.0",
+    "dotenv": "^16.4.7",
+    "express": "^5.1.0",
+    "ffmpeg-static": "^5.3.0",
+    "fs-extra": "^11.3.2",
+    "i18n-iso-countries": "^7.14.0",
+    "node-fetch": "^2.7.0",
+    "papaparse": "^5.5.2",
+    "path": "^0.12.7",
+    "playwright": "^1.56.1",
+    "puppeteer": "^19.0.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-recaptcha": "^3.6.8",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "puppeteer-screen-recorder": "^3.0.6",
+    "puppeteer-stream": "^3.0.22",
+    "random-useragent": "^0.5.0",
+    "tor-request": "^3.1.0",
+    "xlsx": "^0.18.5"
+  }
+}
